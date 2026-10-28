@@ -447,3 +447,12 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .vh-foot { text-align:center; padding-top:6px; border-top:1px solid rgba(216,174,90,.22); margin-top:4px; }
 .vh-vol { font-family:Marcellus,serif; font-size:.95rem; letter-spacing:.12em; color:rgba(242,231,206,.35); line-height:1; }
 .vh-foot small { display:block; font-family:Marcellus,serif; font-size:.52rem; letter-spacing:.2em; color:#cfc2a4; margin-top:3px; }
+
+/* Tarjetas enriquecidas de Proyectos con carrusel de arcos y lore */
+.proj-card { padding:28px; }
+.proj-top { display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; padding-bottom:20px; border-bottom:1px solid var(--line); }
+.proj-cover { width:92px; aspect-ratio:2/3; object-fit:cover; border-radius:8px; border:1.5px solid var(--gold); box-shadow:0 8px 22px #000a; flex:none; }
+.proj-note { padding:14px 0; border-bottom:1px solid var(--line); color:var(--muted); font-size:.94rem; line-height:1.6; }
+.proj-showcase { padding-top:16px; }
+.proj-sh-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.ba-right { background:rgba(38,78,56,.18) !important; border-color:rgba(143,209,158,.32) !important; }

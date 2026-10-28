@@ -159,15 +159,88 @@ function viewDownloads() {
   });
 }
 
+let projIdx = {};
 function viewProjects() {
-  app.innerHTML = head("Archivo arcano", "Proyectos") + `<p class="muted" style="text-align:center;margin-top:-10px">En lo que estamos trabajando.</p>` +
-    PROJECTS.map(p => {
-      const cells = []; for (let n = p.from; n <= p.to; n++) cells.push(`<span class="${p.done.includes(n) ? "done" : n === p.current ? "cur" : ""}">${String(n).padStart(2, "0")}${p.done.includes(n) ? "<br>✓" : ""}</span>`);
-      return `<div class="panel"><div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between">
-        <div style="flex:1;min-width:260px"><h3 style="font-size:1.5rem;text-transform:uppercase;margin:0 0 8px">${p.title}</h3><p class="muted">${p.desc}</p></div>
-        <div><div class="vgrid">${cells.join("")}</div><div style="text-align:right;margin-top:8px;font-size:1.4rem;color:var(--gold)">${p.done.length} <span class="muted" style="font-size:.9rem">/ ${p.to - p.from + 1} capítulos listos</span></div></div></div>
-        <div class="ba"><div><small>FORMATO ORIGINAL</small>Texto exportado con saltos de página y guiones separadores sueltos.</div><div><small>EDICIÓN WEB</small>Párrafos limpios, separadores ornamentados y glosario interactivo en el libro antiguo.</div></div></div>`;
+  app.innerHTML = head("Archivo de Velztek", "Proyectos") +
+    `<p class="muted" style="text-align:center;margin-top:-10px">Crónica de arcos, lore del mundo de WARYONI y estado de la edición interactiva.</p>
+     <div style="display:flex;justify-content:center;gap:18px;font-size:.8rem;color:var(--muted);margin-bottom:8px">
+       <span><b style="color:#8fd19e">●</b> Completado</span>
+       <span><b style="color:var(--gold)">●</b> En curso / Arco actual</span>
+     </div>` +
+    PROJECTS.map((p, idx) => {
+      const cells = [];
+      for (let n = p.from; n <= p.to; n++) {
+        const isDone = p.done.includes(n);
+        const isCur = n === p.current;
+        cells.push(`<span class="${isDone ? "done" : isCur ? "cur" : ""}">${String(n).padStart(2, "0")}<br>${isDone ? "✓" : "·"}</span>`);
+      }
+      const hList = p.highlights || [];
+      const curH = projIdx[idx] ?? 0;
+      const h = hList[curH] || {};
+
+      return `<div class="panel proj-card">
+        <div class="proj-top">
+          <img src="${p.cover || "novela/cover.jpg"}" alt="${esc(p.title)}" class="proj-cover">
+          <div style="flex:1;min-width:250px">
+            <div class="eyebrow" style="text-align:left">${esc(p.badge || "PROYECTO")}</div>
+            <h3 style="font-size:1.55rem;text-transform:uppercase;margin:4px 0 8px;color:#f4e8c8">${esc(p.title)}</h3>
+            <p class="muted" style="margin:0;line-height:1.6">${esc(p.desc)}</p>
+          </div>
+          <div style="min-width:240px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+              <small class="eyebrow">${esc(p.unitLabel || "VOLÚMENES")}</small>
+              <div style="font-size:1.35rem;color:var(--gold)">${p.done.length} <span class="muted" style="font-size:.82rem">/ ${p.to - p.from + 1} ${esc(p.statLabel || "listos")}</span></div>
+            </div>
+            <div class="vgrid" style="grid-template-columns:repeat(6,1fr)">${cells.join("")}</div>
+            <div class="muted" style="font-size:.78rem;margin-top:6px">● Arco más reciente: Volumen ${p.current} (Cap. 70 · Bharani)</div>
+          </div>
+        </div>
+
+        ${p.note ? `<div class="proj-note">${esc(p.note)}</div>` : ""}
+
+        ${hList.length ? `
+          <div class="proj-showcase" data-pidx="${idx}">
+            <div class="proj-sh-head">
+              <div>
+                <div class="eyebrow" style="text-align:left;color:#d8b15a">${esc(h.arc)}</div>
+                <h4 style="margin:4px 0 0;font-size:1.25rem;color:#f4e8c8">${esc(h.heading)}</h4>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <button type="button" class="ib" data-prev="${idx}" title="Anterior">‹</button>
+                <span class="muted" style="font-family:Marcellus,serif;font-size:.78rem;min-width:54px;text-align:center">${curH + 1} de ${hList.length}</span>
+                <button type="button" class="ib" data-next="${idx}" title="Siguiente">›</button>
+              </div>
+            </div>
+            <div class="ba">
+              <div>
+                <small>${esc(h.leftTag)}</small>
+                <p style="margin:0;line-height:1.65;white-space:pre-line">${esc(h.leftText)}</p>
+              </div>
+              <div class="ba-right">
+                <small style="color:#8fd19e">${esc(h.rightTag)}</small>
+                <p style="margin:0;line-height:1.65;white-space:pre-line">${esc(h.rightText)}</p>
+              </div>
+            </div>
+          </div>` : ""}
+      </div>`;
     }).join("");
+
+  app.querySelectorAll("[data-prev]").forEach(btn => {
+    btn.onclick = () => {
+      const i = +btn.dataset.prev;
+      const len = PROJECTS[i].highlights.length;
+      projIdx[i] = ((projIdx[i] ?? 0) - 1 + len) % len;
+      viewProjects();
+    };
+  });
+  app.querySelectorAll("[data-next]").forEach(btn => {
+    btn.onclick = () => {
+      const i = +btn.dataset.next;
+      const len = PROJECTS[i].highlights.length;
+      projIdx[i] = ((projIdx[i] ?? 0) + 1) % len;
+      viewProjects();
+    };
+  });
 }
 
 function viewCredits() {
