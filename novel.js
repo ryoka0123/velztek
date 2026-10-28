@@ -1,4 +1,4 @@
-﻿// Novela: catálogo de novelas/volúmenes, libro ornamentado, lector con guardado de posición y marcadores.
+// Novela: catálogo de novelas/volúmenes, libro ornamentado, lector con guardado de posición y marcadores.
 let NOVEL = null;
 let scrollHandler = null;
 
@@ -351,13 +351,9 @@ async function viewLeer(cn) {
   document.getElementById("btnshare").onclick = async e => {
     try { await navigator.clipboard.writeText(location.href); e.currentTarget.style.borderColor = "#c89b3c"; } catch {}
   };
-  document.getElementById("btntts").onclick = e => {
-    if (!("speechSynthesis" in window)) return;
-    if (speechSynthesis.speaking) { speechSynthesis.cancel(); e.currentTarget.classList.remove("active"); return; }
-    const u = new SpeechSynthesisUtterance(txt.innerText); u.lang = "es-ES";
-    u.onend = () => e.currentTarget.classList.remove("active");
-    e.currentTarget.classList.add("active"); speechSynthesis.speak(u);
-  };
+  if (typeof mountAudiobookPlayer === "function") {
+    mountAudiobookPlayer({ short: pt.short, badge: pt.badge, name: pt.name, vNum, rawText: text });
+  }
   const sbar = document.getElementById("sbar"), sinput = document.getElementById("sinput"), scount = document.getElementById("scount");
   const baseHTML = body;
   document.getElementById("btnsearch").onclick = () => { sbar.hidden = !sbar.hidden; if (!sbar.hidden) sinput.focus(); };
