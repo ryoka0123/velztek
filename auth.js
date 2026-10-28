@@ -128,6 +128,9 @@ function renderLoginRegisterCard(errorMsg = "") {
   app.innerHTML = head("Archivo de Velztek", isLogin ? "Iniciar Sesión" : "Crear Cuenta") + `
     <div class="auth-wrap">
       <div class="auth-card panel">
+        <div id="cloud-badge" style="text-align:center;font-size:.76rem;padding:6px 10px;border-radius:999px;margin-bottom:14px;background:rgba(240,196,109,.08);border:1px solid var(--line);color:var(--muted)">
+          ⏳ Verificando conexión con la base de datos…
+        </div>
         <div class="auth-tabs">
           <button type="button" class="${isLogin ? "on" : ""}" id="tab-login">Iniciar Sesión</button>
           <button type="button" class="${!isLogin ? "on" : ""}" id="tab-reg">Registrarse</button>
@@ -165,6 +168,18 @@ function renderLoginRegisterCard(errorMsg = "") {
   document.getElementById("tab-login").onclick = () => { authMode = "login"; renderLoginRegisterCard(); };
   document.getElementById("tab-reg").onclick = () => { authMode = "register"; renderLoginRegisterCard(); };
   document.getElementById("switch-auth").onclick = () => { authMode = isLogin ? "register" : "login"; renderLoginRegisterCard(); };
+
+  callCloudAuth({ action: "status" }).then(st => {
+    const el = document.getElementById("cloud-badge");
+    if (!el) return;
+    if (st && st.cloud) {
+      el.style.borderColor = "rgba(80,210,140,.45)";
+      el.style.color = "#8ff0b8";
+      el.innerHTML = "🟢 Base de Datos en la Nube Conectada · Guardado 24/7 activo";
+    } else {
+      el.innerHTML = "💾 Modo Local del Navegador · Crea o restaura tu cuenta aquí";
+    }
+  });
 
   app.querySelectorAll("[data-ava]").forEach(img => {
     img.onclick = () => {
@@ -294,7 +309,7 @@ async function renderLoggedProfile(user) {
         <div style="display:flex;gap:18px;align-items:center;flex:1;min-width:260px;flex-wrap:wrap">
           <img src="${user.avatar || AVATARS[0]}" alt="Avatar" class="prof-ava">
           <div style="flex:1;min-width:200px">
-            <div class="eyebrow" style="text-align:left">CUENTA ACTIVA · ${esc(user.email)}</div>
+            <div class="eyebrow" style="text-align:left">CUENTA ACTIVA · ${esc(user.email)} <span id="prof-cloud-badge" style="margin-left:8px;color:#8ff0b8;font-size:.72rem"></span></div>
             <div style="display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap">
               <input id="profname" value="${esc(user.name)}" class="finput" style="margin:0;font-size:1.2rem;max-width:240px">
               <button class="ghost" id="savename">Guardar</button>
@@ -356,19 +371,26 @@ async function renderLoggedProfile(user) {
       </div>
     </div>`;
 
+  callCloudAuth({ action: "status" }).then(st => {
+    const b = document.getElementById("prof-cloud-badge");
+    if (b && st && st.cloud) b.textContent = "· 🟢 Guardado en la Nube Activo";
+  });
+
   document.getElementById("savename").onclick = () => {
     const val = document.getElementById("profname").value.trim() || user.name;
     const db = getUsersDB();
     db[user.email].name = val;
     saveUsersDB(db);
+    syncProgressToUser();
     updateHeaderAccountBtn();
-    document.getElementById("syncmsg").textContent = "✓ Nombre actualizado en tu cuenta.";
+    document.getElementById("syncmsg").textContent = "✓ Nombre actualizado y guardado en la nube.";
   };
   app.querySelectorAll("[data-chava]").forEach(img => {
     img.onclick = () => {
       const db = getUsersDB();
       db[user.email].avatar = img.dataset.chava;
       saveUsersDB(db);
+      syncProgressToUser();
       renderAuthView();
     };
   });

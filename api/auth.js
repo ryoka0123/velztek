@@ -33,7 +33,16 @@ module.exports = async (req, res) => {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
-    const action = body.action || req.query?.action;
+    const action = body.action || req.query?.action || "status";
+
+    if (action === "status") {
+      const r = await fetch(`${REST_URL}/ping`, {
+        headers: { Authorization: `Bearer ${REST_TOKEN}` }
+      });
+      const pingData = await r.json();
+      return res.status(200).json({ ok: true, cloud: pingData?.result === "PONG", status: pingData?.result || "OK" });
+    }
+
     const email = String(body.email || req.query?.email || "").trim().toLowerCase();
     if (!email) return res.status(400).json({ ok: false, error: "Falta correo o usuario." });
 
