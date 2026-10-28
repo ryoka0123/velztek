@@ -1,0 +1,542 @@
+{
+  "title": "Velztek",
+  "author": "WARYONI",
+  "status": "En curso",
+  "genre": "Fantasía · Isekai y Reencarnación",
+  "cover": "novela/cover.jpg",
+  "updated": "25/07/2026",
+  "published": "2021",
+  "tags": [
+    "chicoachica",
+    "fantasía",
+    "genderbender",
+    "isekai",
+    "magia",
+    "poderes",
+    "reencarnación",
+    "renacer",
+    "velztek",
+    "yuri"
+  ],
+  "synopsis": "Un bosque inmenso estaba delante de sus ojos y una vida nueva de la cual no se sabía quién era la protagonista.\nDos almas unidas en busca de una nueva oportunidad en un mundo de fantasía.",
+  "credits": [
+    "Historia original: WARYONI",
+    "Edición web: Archivo Arcano"
+  ],
+  "glossary": [
+    {
+      "term": "Velztek",
+      "def": "Raza de rasgos lupinos (orejas caídas y cola esponjosa) con pequeños cuernos que crecen al alcanzar la adultez."
+    },
+    {
+      "term": "Kraniel",
+      "def": "Uno de los clanes conocidos entre las velztek."
+    }
+  ],
+  "chapters": [
+    {
+      "n": 1,
+      "title": "(Capítulo 0)",
+      "file": "cap-001.txt",
+      "words": 189
+    },
+    {
+      "n": 2,
+      "title": "(Capítulo 1)  Renacer",
+      "file": "cap-002.txt",
+      "words": 2900
+    },
+    {
+      "n": 3,
+      "title": "(Capítulo 2) Depredador",
+      "file": "cap-003.txt",
+      "words": 2826
+    },
+    {
+      "n": 4,
+      "title": "(Capítulo 3) Hogar",
+      "file": "cap-004.txt",
+      "words": 3056
+    },
+    {
+      "n": 5,
+      "title": "(Capítulo 4) Conejos",
+      "file": "cap-005.txt",
+      "words": 3018
+    },
+    {
+      "n": 6,
+      "title": "(Capitulo 5) Garras y Colmillos",
+      "file": "cap-006.txt",
+      "words": 3177
+    },
+    {
+      "n": 7,
+      "title": "(Capitulo 6) En lo profundo",
+      "file": "cap-007.txt",
+      "words": 3085
+    },
+    {
+      "n": 8,
+      "title": "(Capitulo 7) Avance",
+      "file": "cap-008.txt",
+      "words": 3000
+    },
+    {
+      "n": 9,
+      "title": "(Capítulo 8) Extraños",
+      "file": "cap-009.txt",
+      "words": 3118
+    },
+    {
+      "n": 10,
+      "title": "(Capitulo 9) Un viejo regalo",
+      "file": "cap-010.txt",
+      "words": 3165
+    },
+    {
+      "n": 11,
+      "title": "(Capitulo 10) Conocidos Desconocidos",
+      "file": "cap-011.txt",
+      "words": 2928
+    },
+    {
+      "n": 12,
+      "title": "Velztek #1",
+      "file": "cap-012.txt",
+      "words": 789
+    },
+    {
+      "n": 13,
+      "title": "(Capitulo 11) Confidencial",
+      "file": "cap-013.txt",
+      "words": 2935
+    },
+    {
+      "n": 14,
+      "title": "(Capitulo 12) Atrapada",
+      "file": "cap-014.txt",
+      "words": 3038
+    },
+    {
+      "n": 15,
+      "title": "(Capitulo 13) Quien es ella?",
+      "file": "cap-015.txt",
+      "words": 3034
+    },
+    {
+      "n": 16,
+      "title": "(Capitulo 14) Nuevo ciclo",
+      "file": "cap-016.txt",
+      "words": 3125
+    },
+    {
+      "n": 17,
+      "title": "(Capitulo 15) Primer Día",
+      "file": "cap-017.txt",
+      "words": 3461
+    },
+    {
+      "n": 18,
+      "title": "(Capítulo 16) Enfermera",
+      "file": "cap-018.txt",
+      "words": 3171
+    },
+    {
+      "n": 19,
+      "title": "(Capítulo 17) Prueba",
+      "file": "cap-019.txt",
+      "words": 3051
+    },
+    {
+      "n": 20,
+      "title": "(Capítulo 18) Magia y misterio?",
+      "file": "cap-020.txt",
+      "words": 3066
+    },
+    {
+      "n": 21,
+      "title": "(Capítulo 19) Cuentos del bosque",
+      "file": "cap-021.txt",
+      "words": 2078
+    },
+    {
+      "n": 22,
+      "title": "(Capítulo 20) Práctica final",
+      "file": "cap-022.txt",
+      "words": 2705
+    },
+    {
+      "n": 23,
+      "title": "Velztek #2",
+      "file": "cap-023.txt",
+      "words": 1540
+    },
+    {
+      "n": 24,
+      "title": "(Capítulo 21) Cambios",
+      "file": "cap-024.txt",
+      "words": 3207
+    },
+    {
+      "n": 25,
+      "title": "(Capítulo 22) Malestar",
+      "file": "cap-025.txt",
+      "words": 3151
+    },
+    {
+      "n": 26,
+      "title": "(Capítulo 23) Sucesos",
+      "file": "cap-026.txt",
+      "words": 3045
+    },
+    {
+      "n": 27,
+      "title": "(Capítulo 24) Aquella niña",
+      "file": "cap-027.txt",
+      "words": 3232
+    },
+    {
+      "n": 28,
+      "title": "(Capítulo 25) Aquel Niño",
+      "file": "cap-028.txt",
+      "words": 3662
+    },
+    {
+      "n": 29,
+      "title": "(Capítulo 26)Despertar",
+      "file": "cap-029.txt",
+      "words": 2908
+    },
+    {
+      "n": 30,
+      "title": "(Capítulo 27)Estilo Kraniel",
+      "file": "cap-030.txt",
+      "words": 2876
+    },
+    {
+      "n": 31,
+      "title": "(Capítulo 28)Reencuentro",
+      "file": "cap-031.txt",
+      "words": 3014
+    },
+    {
+      "n": 32,
+      "title": "(Capítulo 29)Preludio del final",
+      "file": "cap-032.txt",
+      "words": 2942
+    },
+    {
+      "n": 33,
+      "title": "(Capítulo 30)Inicia el torneo de clases",
+      "file": "cap-033.txt",
+      "words": 3193
+    },
+    {
+      "n": 34,
+      "title": "Velztek #3",
+      "file": "cap-034.txt",
+      "words": 1073
+    },
+    {
+      "n": 35,
+      "title": "(Capítulo 31) Vs 3",
+      "file": "cap-035.txt",
+      "words": 3214
+    },
+    {
+      "n": 36,
+      "title": "(Capítulo 32)Kelly",
+      "file": "cap-036.txt",
+      "words": 3025
+    },
+    {
+      "n": 37,
+      "title": "(Capítulo 33) Perseverar",
+      "file": "cap-037.txt",
+      "words": 2818
+    },
+    {
+      "n": 38,
+      "title": "(Capítulo 34)Que sucedió?",
+      "file": "cap-038.txt",
+      "words": 2963
+    },
+    {
+      "n": 39,
+      "title": "(Capítulo 35)Perdida en mi",
+      "file": "cap-039.txt",
+      "words": 3109
+    },
+    {
+      "n": 40,
+      "title": "(Capítulo 36)Choque de Bestias",
+      "file": "cap-040.txt",
+      "words": 4506
+    },
+    {
+      "n": 41,
+      "title": "(Capítulo 37) Mi otro yo",
+      "file": "cap-041.txt",
+      "words": 3201
+    },
+    {
+      "n": 42,
+      "title": "(Capítulo 38)Renacer",
+      "file": "cap-042.txt",
+      "words": 3078
+    },
+    {
+      "n": 43,
+      "title": "(Capítulo 39) Mi nombre",
+      "file": "cap-043.txt",
+      "words": 2984
+    },
+    {
+      "n": 44,
+      "title": "(Capítulo 40)La nueva yo",
+      "file": "cap-044.txt",
+      "words": 3074
+    },
+    {
+      "n": 45,
+      "title": "Velztek #4 Especial Fin de año",
+      "file": "cap-045.txt",
+      "words": 2870
+    },
+    {
+      "n": 46,
+      "title": "(Capítulo 41)Encuentros",
+      "file": "cap-046.txt",
+      "words": 3102
+    },
+    {
+      "n": 47,
+      "title": "(Capítulo 42)Enfrentamiento",
+      "file": "cap-047.txt",
+      "words": 3170
+    },
+    {
+      "n": 48,
+      "title": "(Capítulo 43)Un vistazo al pasado",
+      "file": "cap-048.txt",
+      "words": 2998
+    },
+    {
+      "n": 49,
+      "title": "(Capítulo 44)Mi propia Magia",
+      "file": "cap-049.txt",
+      "words": 3404
+    },
+    {
+      "n": 50,
+      "title": "(Capítulo 45) Colapso",
+      "file": "cap-050.txt",
+      "words": 3126
+    },
+    {
+      "n": 51,
+      "title": "(Capítulo 46) Peligro!",
+      "file": "cap-051.txt",
+      "words": 3053
+    },
+    {
+      "n": 52,
+      "title": "(Capítulo 47)Punto de quiebre",
+      "file": "cap-052.txt",
+      "words": 3299
+    },
+    {
+      "n": 53,
+      "title": "(Capítulo 48) Recta final",
+      "file": "cap-053.txt",
+      "words": 3279
+    },
+    {
+      "n": 54,
+      "title": "(Capítulo 49) Desesperación",
+      "file": "cap-054.txt",
+      "words": 3140
+    },
+    {
+      "n": 55,
+      "title": "(Capítulo 50)Gritos y Llantos",
+      "file": "cap-055.txt",
+      "words": 6145
+    },
+    {
+      "n": 56,
+      "title": "Epílogo 1",
+      "file": "cap-056.txt",
+      "words": 3319
+    },
+    {
+      "n": 57,
+      "title": "Epílogo 2",
+      "file": "cap-057.txt",
+      "words": 3867
+    },
+    {
+      "n": 58,
+      "title": "Velztek #5 Especial 50",
+      "file": "cap-058.txt",
+      "words": 4853
+    },
+    {
+      "n": 59,
+      "title": "Interludio 1",
+      "file": "cap-059.txt",
+      "words": 2086
+    },
+    {
+      "n": 60,
+      "title": "Interludio 2",
+      "file": "cap-060.txt",
+      "words": 2000
+    },
+    {
+      "n": 61,
+      "title": "(Capitulo 51) Mucho ha cambiado",
+      "file": "cap-061.txt",
+      "words": 3090
+    },
+    {
+      "n": 62,
+      "title": "(Capitulo 52) Encuentro",
+      "file": "cap-062.txt",
+      "words": 3079
+    },
+    {
+      "n": 63,
+      "title": "(Capitulo 53)Mal presagio",
+      "file": "cap-063.txt",
+      "words": 2921
+    },
+    {
+      "n": 64,
+      "title": "(Capitulo 54) Advertencia",
+      "file": "cap-064.txt",
+      "words": 3183
+    },
+    {
+      "n": 65,
+      "title": "(Capitulo 55)Azari",
+      "file": "cap-065.txt",
+      "words": 3649
+    },
+    {
+      "n": 66,
+      "title": "Feliz Navidad",
+      "file": "cap-066.txt",
+      "words": 651
+    },
+    {
+      "n": 67,
+      "title": "Velztek 2025",
+      "file": "cap-067.txt",
+      "words": 4533
+    },
+    {
+      "n": 68,
+      "title": "(Capitulo 56) Primera Oleada",
+      "file": "cap-068.txt",
+      "words": 2842
+    },
+    {
+      "n": 69,
+      "title": "(Capitulo 57) Ruptura",
+      "file": "cap-069.txt",
+      "words": 2956
+    },
+    {
+      "n": 70,
+      "title": "(Capitulo 58) Tiempo de reposo",
+      "file": "cap-070.txt",
+      "words": 2975
+    },
+    {
+      "n": 71,
+      "title": "(Capítulo 59) Maestras",
+      "file": "cap-071.txt",
+      "words": 2942
+    },
+    {
+      "n": 72,
+      "title": "(Capítulo 60)Entrenamiento previo",
+      "file": "cap-072.txt",
+      "words": 3150
+    },
+    {
+      "n": 73,
+      "title": "Velztek #6",
+      "file": "cap-073.txt",
+      "words": 2782
+    },
+    {
+      "n": 74,
+      "title": "(Capítulo 61)Amigo",
+      "file": "cap-074.txt",
+      "words": 3329
+    },
+    {
+      "n": 75,
+      "title": "(Capitulo 62)Aura",
+      "file": "cap-075.txt",
+      "words": 3292
+    },
+    {
+      "n": 76,
+      "title": "(Capitulo 63)Herencia",
+      "file": "cap-076.txt",
+      "words": 3280
+    },
+    {
+      "n": 77,
+      "title": "(Capitulo 64)Entrenamiento final",
+      "file": "cap-077.txt",
+      "words": 3404
+    },
+    {
+      "n": 78,
+      "title": "(Capitulo 65)Inicia la incursion",
+      "file": "cap-078.txt",
+      "words": 3452
+    },
+    {
+      "n": 79,
+      "title": "Velztek 2026",
+      "file": "cap-079.txt",
+      "words": 973
+    },
+    {
+      "n": 80,
+      "title": "(Capitulo 66) Carnero Carmesí",
+      "file": "cap-080.txt",
+      "words": 4403
+    },
+    {
+      "n": 81,
+      "title": "(Capitulo 67)Duelo de carneros",
+      "file": "cap-081.txt",
+      "words": 4265
+    },
+    {
+      "n": 82,
+      "title": "(Capitulo 68)Escenarios",
+      "file": "cap-082.txt",
+      "words": 2854
+    },
+    {
+      "n": 83,
+      "title": "(Capitulo 69)Charla de chicas",
+      "file": "cap-083.txt",
+      "words": 3595
+    },
+    {
+      "n": 84,
+      "title": "(Capitulo 70)Bharani",
+      "file": "cap-084.txt",
+      "words": 3100
+    }
+  ]
+}

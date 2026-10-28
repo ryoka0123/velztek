@@ -1,0 +1,6 @@
+# Ignorar archivos fuente pesados y temporales
+novela/velztek.epub
+*.epub
+*.zip
+.DS_Store
+Thumbs.db
