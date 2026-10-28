@@ -456,7 +456,7 @@ const WORLD_MAP_NODES = {
   continentes: [
     {
       id: "juhne-centro",
-      x: 49, y: 48,
+      x: 54, y: 40,
       type: "capital",
       icon: "👑",
       name: "Continente Juhne (Corazón Velztek)",
@@ -466,11 +466,11 @@ const WORLD_MAP_NODES = {
       chars: "Nylie Kraniel, Diana Kraniel, Okami Kraniel, Grania Gallard",
       cap: 34,
       capLabel: "Velztek #3 y Especial 2025",
-      desc: "El continente más grande y céntrico del supercontinente central. Creado para los hijos de la sexta Diosa, Veztel. Su geografía abarca desde las cumbres nevadas del norte (hogar de los Gallard del norte) y los bosques prohibidos del este, hasta las sabanas áridas de las tribus Helkir y las costas oceánicas de los 13 Clanes Marinos."
+      desc: "El continente más grande y céntrico del supercontinente central. Creado para los hijos de la sexta Diosa, Veztel. Su geografía abarca desde las cumbres nevadas del norte (hogar de los Gallard del norte) y los bosques prohibidos del sureste, hasta las sabanas áridas de las tribus Helkir y las costas oceánicas de los 13 Clanes Marinos."
     },
     {
       id: "bosque-aries-pin",
-      x: 56, y: 55,
+      x: 67, y: 71,
       type: "danger",
       icon: "🌲",
       name: "El Gran Bosque de Aries",
@@ -484,7 +484,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "pueblo-kraen",
-      x: 47, y: 58,
+      x: 53, y: 63,
       type: "city",
       icon: "🏰",
       name: "Pueblo Kraen y Mansión de Diana",
@@ -498,7 +498,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "norte-gallard",
-      x: 48, y: 28,
+      x: 55, y: 17,
       type: "clan",
       icon: "❄️",
       name: "Cumbres del Norte (Dominio Gallard y Bearing)",
@@ -512,7 +512,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "frontera-ecaron",
-      x: 36, y: 46,
+      x: 41, y: 44,
       type: "clan",
       icon: "🛡️",
       name: "Bastiones Fronterizos de Ecaron y Therabos",
@@ -526,7 +526,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "sabana-helkir",
-      x: 61, y: 40,
+      x: 68, y: 46,
       type: "clan",
       icon: "☀️",
       name: "Sabanas y Desiertos de Helkir y Taigarv",
@@ -540,7 +540,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "costas-marinas",
-      x: 49, y: 74,
+      x: 55, y: 88,
       type: "sea",
       icon: "🌊",
       name: "Mares del Sur y Costas de los 13 Clanes Marinos",
@@ -554,7 +554,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "suyne-hadas",
-      x: 20, y: 42,
+      x: 18, y: 63,
       type: "continent",
       icon: "🦋",
       name: "Continente Suyne (Tierra de las Hadas)",
@@ -568,7 +568,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "aleria-dragones",
-      x: 80, y: 52,
+      x: 86, y: 55,
       type: "continent",
       icon: "🐉",
       name: "Archipiélago de Aleria (Tierra de los Dragones)",
@@ -582,7 +582,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "galem-demonios",
-      x: 78, y: 20,
+      x: 85, y: 20,
       type: "continent",
       icon: "🔥",
       name: "Continente Galem (Imperio de los Demonios)",
@@ -596,7 +596,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "tierras-lejanas",
-      x: 20, y: 18,
+      x: 38, y: 23,
       type: "continent",
       icon: "🏛️",
       name: "Dominios de los Jürén, Dergar, Elfos, Ángeles y Humanos",
@@ -612,7 +612,7 @@ const WORLD_MAP_NODES = {
   kraniel: [
     {
       id: "isla-nylie",
-      x: 68, y: 44,
+      x: 72, y: 56,
       type: "capital",
       icon: "🌸",
       name: "Isla Fluvial del Despertar (Refugio de Nylie)",
@@ -626,7 +626,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "sello-aries",
-      x: 82, y: 30,
+      x: 88, y: 18,
       type: "danger",
       icon: "♈",
       name: "Santuario Sellado del Rey Celestial Aries",
@@ -640,7 +640,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "barrera-bosque",
-      x: 52, y: 48,
+      x: 50, y: 50,
       type: "danger",
       icon: "🌀",
       name: "La Barrera de Niebla y Desorientación",
@@ -654,7 +654,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "mansion-diana",
-      x: 38, y: 42,
+      x: 45.5, y: 43,
       type: "capital",
       icon: "🏛️",
       name: "Mansión de Diana Kraniel",
@@ -668,7 +668,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "academia-kraen",
-      x: 24, y: 56,
+      x: 35, y: 34,
       type: "city",
       icon: "⚔️",
       name: "Escuela y Arena del Torneo de Clases (Kraen)",
@@ -682,7 +682,7 @@ const WORLD_MAP_NODES = {
     },
     {
       id: "gremio-kraen",
-      x: 22, y: 34,
+      x: 19, y: 36,
       type: "city",
       icon: "🛡️",
       name: "Sede del Gremio de Aventureros y Orfanato de Kraen",

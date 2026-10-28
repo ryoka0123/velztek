@@ -512,150 +512,7 @@ function openCodexModal(id) {
 
 let mapMode = "continentes"; // "continentes" | "kraniel"
 let selectedPinId = null;
-
-function buildWorldSvg(mode) {
-  if (mode === "continentes") {
-    return `<svg viewBox="0 0 1000 620" class="wmap-svg" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="oceanGrad" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stop-color="#112238"/>
-          <stop offset="65%" stop-color="#091322"/>
-          <stop offset="100%" stop-color="#050912"/>
-        </radialGradient>
-        <linearGradient id="juhneLand" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#3b3123"/>
-          <stop offset="50%" stop-color="#2c2419"/>
-          <stop offset="100%" stop-color="#1e1810"/>
-        </linearGradient>
-        <linearGradient id="suyneLand" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#1e3830"/>
-          <stop offset="100%" stop-color="#13241f"/>
-        </linearGradient>
-        <linearGradient id="aleriaLand" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#3d271d"/>
-          <stop offset="100%" stop-color="#24150e"/>
-        </linearGradient>
-        <linearGradient id="galemLand" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#361c2e"/>
-          <stop offset="100%" stop-color="#1f0f1a"/>
-        </linearGradient>
-        <filter id="landGlow" x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.85"/>
-        </filter>
-      </defs>
-
-      <!-- Océano y cuadrícula cartográfica -->
-      <rect width="1000" height="620" fill="url(#oceanGrad)"/>
-      <g stroke="rgba(216,177,90,0.08)" stroke-width="1">
-        <line x1="0" y1="124" x2="1000" y2="124"/><line x1="0" y1="248" x2="1000" y2="248"/>
-        <line x1="0" y1="372" x2="1000" y2="372"/><line x1="0" y1="496" x2="1000" y2="496"/>
-        <line x1="200" y1="0" x2="200" y2="620"/><line x1="400" y1="0" x2="400" y2="620"/>
-        <line x1="600" y1="0" x2="600" y2="620"/><line x1="800" y1="0" x2="800" y2="620"/>
-        <circle cx="500" cy="310" r="260" fill="none" stroke="rgba(216,177,90,0.12)" stroke-dasharray="4 6"/>
-      </g>
-
-      <!-- Tierras Exteriores Noroeste (Jürén, Dergar, Elfos, Ángeles, Humanos) -->
-      <path d="M 55 65 Q 140 45 235 72 Q 290 95 270 145 Q 230 185 155 170 Q 85 160 50 115 Z"
-            fill="#252836" stroke="#8a795d" stroke-width="2" filter="url(#landGlow)"/>
-      <text x="165" y="135" class="map-region-lbl">REINOS EXTERIORES</text>
-
-      <!-- Continente Galem (Demonios - Noreste) -->
-      <path d="M 670 60 Q 775 42 870 78 Q 920 120 885 175 Q 820 205 735 182 Q 660 155 655 105 Z"
-            fill="url(#galemLand)" stroke="#b86b8d" stroke-width="2" filter="url(#landGlow)"/>
-      <text x="775" y="145" class="map-region-lbl">CONTINENTE GALEM</text>
-
-      <!-- Continente Suyne (Hadas - Oeste, dividido por largos ríos) -->
-      <path d="M 75 235 Q 155 195 245 220 Q 305 260 295 340 Q 280 430 200 455 Q 115 445 80 380 Q 55 310 75 235 Z"
-            fill="url(#suyneLand)" stroke="#68b694" stroke-width="2.2" filter="url(#landGlow)"/>
-      <!-- Largos ríos que dividen Suyne -->
-      <path d="M 145 210 Q 185 290 165 360 Q 150 410 190 452" fill="none" stroke="#5cc8ff" stroke-width="3.2" opacity=".8"/>
-      <path d="M 235 225 Q 210 300 250 355 Q 270 390 245 435" fill="none" stroke="#5cc8ff" stroke-width="2.6" opacity=".75"/>
-      <path d="M 82 320 Q 165 315 292 332" fill="none" stroke="#5cc8ff" stroke-width="2.5" opacity=".7"/>
-      <text x="185" y="305" class="map-region-lbl">SUYNE</text>
-      <text x="185" y="322" class="map-sub-lbl">(TIERRA DE LAS HADAS)</text>
-
-      <!-- CONTINENTE CENTRAL JUHNE (Velztek - El más grande y céntrico) -->
-      <path d="M 355 155 Q 445 120 535 138 Q 625 155 660 235 Q 690 315 655 405 Q 615 475 515 488 Q 415 492 362 435 Q 325 365 335 275 Q 338 205 355 155 Z"
-            fill="url(#juhneLand)" stroke="#d8b15a" stroke-width="2.8" filter="url(#landGlow)"/>
-
-      <!-- Regiones internas de Juhne -->
-      <!-- Cordillera Norte (Gallard / Hipera) -->
-      <path d="M 395 190 L 415 162 L 435 190 L 458 158 L 482 190 L 505 164 L 528 190 L 552 168 L 572 192"
-            fill="none" stroke="rgba(235,220,190,0.45)" stroke-width="2"/>
-      <!-- Gran Bosque de Aries (Mancha boscosa esmeralda/carmesí al sureste de Juhne) -->
-      <ellipse cx="560" cy="348" rx="62" ry="44" fill="rgba(22,68,48,0.75)" stroke="#58b88a" stroke-width="1.6" stroke-dasharray="4 3"/>
-      <!-- Río desde el Bosque de Aries hacia Kraen y el mar -->
-      <path d="M 575 330 Q 530 355 475 365 Q 430 395 450 480" fill="none" stroke="#5cc8ff" stroke-width="2.5" opacity=".75"/>
-
-      <text x="495" y="265" class="map-main-lbl">CONTINENTE JUHNE</text>
-      <text x="495" y="284" class="map-sub-lbl">39 CLANES VELZTEK · 3 PILARES</text>
-
-      <!-- Archipiélago de Aleria (Dragones - Este, múltiples islas) -->
-      <g fill="url(#aleriaLand)" stroke="#d98a4e" stroke-width="2" filter="url(#landGlow)">
-        <path d="M 745 255 Q 805 240 845 275 Q 855 320 805 340 Q 750 330 740 290 Z"/>
-        <path d="M 855 315 Q 905 305 925 345 Q 915 390 865 385 Q 840 355 855 315 Z"/>
-        <path d="M 735 365 Q 785 355 815 395 Q 800 440 745 435 Q 715 405 735 365 Z"/>
-        <path d="M 830 410 Q 875 405 895 445 Q 870 475 830 460 Z"/>
-        <circle cx="715" cy="325" r="16"/>
-        <circle cx="910" cy="275" r="14"/>
-      </g>
-      <text x="820" y="362" class="map-region-lbl">ARCHIPIÉLAGO DE ALERIA</text>
-      <text x="820" y="378" class="map-sub-lbl">(9 VARIANTES DE DRAGONES)</text>
-
-      <!-- Rosa de los vientos en la esquina inferior izquierda -->
-      <g transform="translate(75,545)" color="#d8b15a">
-        <circle cx="0" cy="0" r="34" fill="rgba(10,13,24,0.8)" stroke="currentColor" stroke-width="1.2"/>
-        <circle cx="0" cy="0" r="26" fill="none" stroke="currentColor" stroke-width="0.7" stroke-dasharray="2 3"/>
-        <path d="M0 -30 L6 -7 L30 0 L6 7 L0 30 L-6 7 L-30 0 L-6 -7 Z" fill="currentColor" opacity="0.85"/>
-        <text x="0" y="-38" text-anchor="middle" fill="#f4e8c8" font-family="Marcellus,serif" font-size="10">N</text>
-      </g>
-    </svg>`;
-  }
-
-  // Modo regional: Territorio Kraniel, Pueblo Kraen y el Gran Bosque de Aries
-  return `<svg viewBox="0 0 1000 620" class="wmap-svg" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="kraenTer" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#2a2318"/>
-        <stop offset="48%" stop-color="#1f281d"/>
-        <stop offset="100%" stop-color="#0c231b"/>
-      </linearGradient>
-      <radialGradient id="ariesGlow" cx="75%" cy="38%" r="45%">
-        <stop offset="0%" stop-color="rgba(210,55,80,0.32)"/>
-        <stop offset="55%" stop-color="rgba(30,115,85,0.22)"/>
-        <stop offset="100%" stop-color="transparent"/>
-      </radialGradient>
-    </defs>
-
-    <rect width="1000" height="620" fill="url(#kraenTer)"/>
-    <rect width="1000" height="620" fill="url(#ariesGlow)"/>
-
-    <!-- Caminos desde Pueblo Kraen hasta la Mansión de Diana y el Bosque -->
-    <path d="M 220 210 Q 290 240 380 260 Q 450 280 520 295" fill="none" stroke="#c8a464" stroke-width="4" stroke-dasharray="8 6" opacity=".75"/>
-    <path d="M 240 350 Q 310 310 380 260" fill="none" stroke="#c8a464" stroke-width="3.5" stroke-dasharray="6 5" opacity=".7"/>
-
-    <!-- Río que cruza desde el Gran Bosque de Aries, rodea la Isla de Nylie y baja hacia Kraen -->
-    <path d="M 920 120 Q 810 190 730 245 Q 640 295 520 330 Q 380 390 120 510" fill="none" stroke="#4ac0ff" stroke-width="12" opacity=".45"/>
-    <path d="M 920 120 Q 810 190 730 245 Q 640 295 520 330 Q 380 390 120 510" fill="none" stroke="#9be4ff" stroke-width="3" opacity=".8"/>
-
-    <!-- Isla Fluvial de Nylie (donde despertó y vivió 2 años) -->
-    <ellipse cx="680" cy="272" rx="52" ry="30" fill="#23422e" stroke="#7be0ff" stroke-width="2.2"/>
-
-    <!-- Barrera de Niebla y Desorientación (divide Kraen del Bosque de Aries) -->
-    <path d="M 515 20 Q 540 180 510 310 Q 485 450 525 600" fill="none" stroke="#b388ff" stroke-width="6" stroke-dasharray="12 8" opacity=".75"/>
-    <text x="502" y="95" transform="rotate(-88 502 95)" fill="#d9c2ff" font-family="Marcellus,serif" font-size="11" letter-spacing="3">BARRERA DE PERCEPCIÓN</text>
-
-    <!-- Zona Oeste: Pueblo Kraen y Territorio Kraniel -->
-    <circle cx="230" cy="280" r="145" fill="none" stroke="rgba(216,177,90,0.28)" stroke-width="1.5" stroke-dasharray="5 5"/>
-    <text x="230" y="110" class="map-main-lbl">TERRITORIO DEL CLAN KRANIEL</text>
-    <text x="230" y="130" class="map-sub-lbl">PUEBLO KRAEN · GREMIO · ESCUELA · MANSIÓN DE DIANA</text>
-
-    <!-- Zona Este: El Gran Bosque de Aries -->
-    <circle cx="820" cy="185" r="78" fill="rgba(180,35,60,0.18)" stroke="rgba(235,95,120,0.55)" stroke-width="2" stroke-dasharray="4 4"/>
-    <text x="745" y="85" class="map-main-lbl" style="fill:#ffb3c0">EL GRAN BOSQUE DE ARIES</text>
-    <text x="745" y="105" class="map-sub-lbl" style="fill:#e8a4b0">DOMINIO DEL REY CELESTIAL ARIES Y SUS 5 ESTRELLAS</text>
-  </svg>`;
-}
+let mapZoom = 1;
 
 function viewWorldMap() {
   const nodes = WORLD_MAP_NODES[mapMode] || WORLD_MAP_NODES.continentes;
@@ -663,6 +520,7 @@ function viewWorldMap() {
     selectedPinId = nodes[0].id;
   }
   const cur = nodes.find(n => n.id === selectedPinId) || nodes[0];
+  const mapImgSrc = mapMode === "continentes" ? "novela/map-world.jpg" : "novela/map-kraniel.jpg";
 
   app.innerHTML = head("Cartografía Oficial de WARYONI", "Mapa del Mundo") + `
     <p class="muted" style="text-align:center;margin-top:-10px">Explora el Supercontinente Central (Juhne, Suyne y Aleria), los 39 Clanes Velztek, el Pueblo Kraen y el Gran Bosque de Aries.</p>
@@ -677,17 +535,35 @@ function viewWorldMap() {
 
     <div class="map-layout">
       <div class="panel map-stage">
-        <div class="map-canvas">
-          ${buildWorldSvg(mapMode)}
-          ${nodes.map(n => `
-            <button type="button" class="map-pin pin-${n.type} ${n.id === cur.id ? "active" : ""}"
-                    style="left:${n.x}%;top:${n.y}%" data-pin="${n.id}" title="${esc(n.name)}">
-              <span class="pin-pulse"></span>
-              <span class="pin-ico">${n.icon}</span>
-              <span class="pin-tag">${esc(n.name.split("(")[0].trim())}</span>
+        <div class="map-viewport" id="map-viewport">
+          <div class="map-zoom-controls">
+            <button type="button" class="ib" id="mz-in" title="Acercar mapa">＋</button>
+            <button type="button" class="ib" id="mz-out" title="Alejar mapa">－</button>
+            <button type="button" class="ib" id="mz-reset" title="Vista 100%">1:1</button>
+            <button type="button" class="ib" id="mz-full" title="Pantalla completa">⛶</button>
+          </div>
+          <div class="map-canvas" id="map-canvas" style="transform:scale(${mapZoom})">
+            <img src="${mapImgSrc}" alt="Mapa de Velztek" class="wmap-img" draggable="false">
+            ${nodes.map((n, idx) => `
+              <button type="button" class="map-pin pin-${n.type} ${n.id === cur.id ? "active" : ""}"
+                      style="left:${n.x}%;top:${n.y}%" data-pin="${n.id}" title="${esc(n.name)}">
+                <span class="pin-pulse"></span>
+                <span class="pin-num">${idx + 1}</span>
+                <span class="pin-ico">${n.icon}</span>
+                <span class="pin-tag">${esc(n.name.split("(")[0].trim())}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="map-index-strip">
+          ${nodes.map((n, idx) => `
+            <button type="button" class="map-idx-pill ${n.id === cur.id ? "on" : ""}" data-pin="${n.id}">
+              <b>${idx + 1}</b> ${n.icon} <span>${esc(n.name.split("(")[0].trim())}</span>
             </button>
           `).join("")}
         </div>
+
         <div class="map-legend">
           <span><b style="color:#ffd479">●</b> Capital / Corazón</span>
           <span><b style="color:#7be0ff">●</b> Ciudad / Dominio de Clan</span>
@@ -719,11 +595,13 @@ function viewWorldMap() {
 
   document.getElementById("btn-map-world").onclick = () => {
     mapMode = "continentes";
+    mapZoom = 1;
     selectedPinId = WORLD_MAP_NODES.continentes[0].id;
     viewWorldMap();
   };
   document.getElementById("btn-map-kraniel").onclick = () => {
     mapMode = "kraniel";
+    mapZoom = 1;
     selectedPinId = WORLD_MAP_NODES.kraniel[0].id;
     viewWorldMap();
   };
@@ -731,10 +609,26 @@ function viewWorldMap() {
   if (zoomBtn) {
     zoomBtn.onclick = () => {
       mapMode = "kraniel";
+      mapZoom = 1;
       selectedPinId = cur.id === "bosque-aries-pin" ? "isla-nylie" : "mansion-diana";
       viewWorldMap();
     };
   }
+
+  const canvas = document.getElementById("map-canvas");
+  const applyZoom = z => {
+    mapZoom = Math.max(1, Math.min(2.4, +z.toFixed(2)));
+    if (canvas) canvas.style.transform = `scale(${mapZoom})`;
+  };
+  document.getElementById("mz-in").onclick = () => applyZoom(mapZoom + 0.35);
+  document.getElementById("mz-out").onclick = () => applyZoom(mapZoom - 0.35);
+  document.getElementById("mz-reset").onclick = () => applyZoom(1);
+  document.getElementById("mz-full").onclick = () => {
+    const vp = document.getElementById("map-viewport");
+    if (!document.fullscreenElement && vp?.requestFullscreen) vp.requestFullscreen();
+    else if (document.exitFullscreen) document.exitFullscreen();
+  };
+
   app.querySelectorAll("[data-pin]").forEach(btn => {
     btn.onclick = () => {
       selectedPinId = btn.dataset.pin;
