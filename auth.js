@@ -29,7 +29,21 @@ function getCurrentUser() {
   return db[email] || null;
 }
 
-// Sincroniza las claves activas de lectura con el perfil del usuario que tiene sesión iniciada
+// Sincroniza las claves activas de lectura con el perfil del usuario que tiene sesión iniciada (local + nube si está disponible)
+let cloudSyncTimer = null;
+async function callCloudAuth(payload) {
+  try {
+    const r = await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    return await r.json();
+  } catch {
+    return { cloud: false };
+  }
+}
+
 function syncProgressToUser() {
   const email = currentSessionEmail();
   if (!email) return;
@@ -46,6 +60,19 @@ function syncProgressToUser() {
   };
   saveUsersDB(db);
   updateHeaderAccountBtn();
+
+  // Enviar actualización a la base de datos en la nube (con debounce de 1s)
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(() => {
+    callCloudAuth({
+      action: "sync",
+      email,
+      name: db[email].name,
+      avatar: db[email].avatar,
+      progress: db[email].progress,
+      user: db[email]
+    });
+  }, 900);
 }
 
 function loadUserProgressIntoActive(user) {
@@ -185,16 +212,25 @@ function renderLoginRegisterCard(errorMsg = "") {
     const passHash = await hashPass(pass);
 
     if (isLogin) {
+      // 1. Intentar autenticar primero contra la base de datos en la nube (/api/auth)
+      const cloudRes = await callCloudAuth({ action: "login", email, passHash });
+      if (cloudRes && cloudRes.cloud) {
+        if (!cloudRes.ok) return renderLoginRegisterCard(cloudRes.error || "Error al iniciar sesión.");
+        db[email] = cloudRes.user;
+        saveUsersDB(db);
+        store.set("velz_session", email);
+        loadUserProgressIntoActive(cloudRes.user);
+        return renderAuthView();
+      }
+      // 2. Respaldo local en el navegador si la base de datos en la nube aún no está conectada
       const u = db[email];
-      if (!u) return renderLoginRegisterCard("No existe una cuenta con ese correo/usuario. Regístrate primero.");
+      if (!u) return renderLoginRegisterCard("No existe esa cuenta en este navegador. Haz clic en la pestaña «Registrarse» arriba a la derecha para crearla.");
       if (u.passHash && u.passHash !== passHash) return renderLoginRegisterCard("Contraseña incorrecta.");
       store.set("velz_session", email);
       loadUserProgressIntoActive(u);
       renderAuthView();
     } else {
-      if (db[email]) return renderLoginRegisterCard("Ese correo/usuario ya está registrado. Inicia sesión.");
       const name = document.getElementById("f-name").value.trim() || "Viajero Kraniel";
-      // Conserva el progreso que ya llevaba en el navegador al crear su cuenta
       const newUser = {
         email,
         name,
@@ -211,6 +247,13 @@ function renderLoginRegisterCard(errorMsg = "") {
           rcfg: store.get("rcfg", {})
         }
       };
+      const cloudRes = await callCloudAuth({ action: "register", email, user: newUser });
+      if (cloudRes && cloudRes.cloud && !cloudRes.ok) {
+        return renderLoginRegisterCard(cloudRes.error || "Ese usuario ya existe.");
+      }
+      if (!cloudRes?.cloud && db[email]) {
+        return renderLoginRegisterCard("Ese correo/usuario ya está registrado. Inicia sesión.");
+      }
       db[email] = newUser;
       saveUsersDB(db);
       store.set("velz_session", email);
