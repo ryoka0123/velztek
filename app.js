@@ -17,15 +17,105 @@ function ph(line1, line2, hue, w = 400, h = 600) {
 // ---------- vistas ----------
 function head(eyebrow, title) { return `<div class="eyebrow">${eyebrow}</div><h1 class="title">${title}</h1>`; }
 
-function viewHome() {
-  app.innerHTML = head("Archivo de Velztek", "Velztek") + `
-    <div class="panel"><div class="hero" style="display:flex;gap:28px;align-items:center;justify-content:center;flex-wrap:wrap;text-align:left">
-    <img src="novela/cover.jpg" alt="Velztek" style="width:200px;border-radius:14px;border:2px solid var(--gold);box-shadow:0 10px 30px #000a">
-    <div style="max-width:520px"><div class="eyebrow" style="text-align:left">Fantasía · Isekai y Reencarnación · por WARYONI</div>
-    <h2>Dos almas unidas bajo la luna del bosque</h2>
-    <p class="muted">Un bosque inmenso estaba delante de sus ojos y una vida nueva de la cual no se sabía quién era la protagonista. Orejas de lobo, cuernos del linaje Kraniel y un mundo que aguarda entre la niebla.</p>
-    <a class="cta" href="#/novela">Explorar novela →</a> &nbsp; <a class="ghost" href="#/volumen/1" style="padding:12px 18px;display:inline-block">Abrir Volumen I</a></div></div>
-    <div class="home-grid"><a href="#/novela">Novela</a><a href="#/arte">Galería de Arte</a><a href="#/descargas">Descargas</a><a href="#/proyectos">Proyectos</a><a href="#/creditos">Créditos</a></div></div>`;
+async function viewHome() {
+  const mf = await loadNovel();
+  const chs = mf?.chapters || [];
+  const rd = new Set(store.get("nread", []));
+  const lastCap = store.get("nlastcap", null);
+  const resumeCh = (lastCap && chs.find(c => c.n === lastCap)) || chs.find(c => !rd.has(c.n)) || chs[0] || { n: 1, title: "(Capítulo 0)" };
+  const resumePt = parseChapTitle(resumeCh.title, resumeCh.n);
+  const resumeVol = volOfChapter(resumeCh.n);
+
+  const HOME_BOOKS = [
+    { role: "PRINCIPAL", title: "VELZTEK", sub: "6 VOLÚMENES · 84 PARTES", cover: "novela/cover.jpg", href: "#/novela/1", tone: "blue" },
+    { role: "ARCO DEL BOSQUE", title: "EL DESPERTAR", sub: "VOLUMEN 1 · 12 PARTES", cover: "novela/art/flor.jpg", href: "#/volumen/1", tone: "emerald" },
+    { role: "LINAJE", title: "ESTILO KRANIEL", sub: "VOLUMEN 3 · 11 PARTES", cover: "novela/art/clan.jpg", href: "#/volumen/3", tone: "crimson" },
+    { role: "CLÍMAX", title: "PUNTO DE QUIEBRE", sub: "VOLUMEN 5 · 15 PARTES", cover: "novela/art/sketch2.jpg", href: "#/volumen/5", tone: "obsidian" },
+    { role: "ARCO ACTUAL", title: "CARNERO CARMESÍ", sub: "VOLUMEN 6 · 24 PARTES", cover: "novela/art/sketch3.png", href: "#/volumen/6", tone: "bronze" }
+  ];
+
+  const COMPASS_SVG = `<svg viewBox="0 0 60 60" class="b-emblem"><circle cx="30" cy="30" r="14" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="30" cy="30" r="19" fill="none" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 3"/><path d="M30 4 L33 26 L56 30 L33 34 L30 56 L27 34 L4 30 L27 26 Z" fill="currentColor" opacity=".88"/></svg>`;
+
+  app.innerHTML = `
+    <div class="home-hero-title">
+      <div class="crest-bg"></div>
+      <h1 class="title grand-title">BIBLIOTECA DE VELZTEK</h1>
+    </div>
+
+    <section class="panel showcase-panel">
+      <div class="showcase-head">
+        <div class="sh-spacer"></div>
+        <div class="sh-center">
+          <div class="eyebrow">COLECCIÓN LITERARIA</div>
+          <h2>NOVELAS</h2>
+        </div>
+        <a class="continue-box" href="#/leer/${resumeCh.n}">
+          <div>
+            <small>${rd.size || lastCap ? "CONTINUAR LEYENDO" : "COMENZAR LECTURA"}</small>
+            <b>Volumen ${resumeVol} · ${esc(resumePt.badge)} <em>${esc(resumePt.name)}</em></b>
+          </div>
+          <span class="arr">→</span>
+        </a>
+      </div>
+
+      <div class="shelf-wrap">
+        <button class="shelf-arrow left" id="sh-prev" aria-label="Anterior">‹</button>
+        <div class="hardcover-row" id="hc-row">
+          ${HOME_BOOKS.map(b => `
+            <a class="hc-col" href="${b.href}">
+              <div class="hc-role">${esc(b.role)}</div>
+              <div class="hc-book ${b.tone}">
+                <div class="hc-spine"></div>
+                <div class="hc-frame">
+                  <img src="${b.cover}" alt="${esc(b.title)}" class="hc-art">
+                  <div class="hc-shade"></div>
+                  ${COMPASS_SVG}
+                  <div class="hc-caption">
+                    <h3>${esc(b.title)}</h3>
+                    <small>${esc(b.sub)}</small>
+                  </div>
+                </div>
+              </div>
+            </a>`).join("")}
+        </div>
+        <button class="shelf-arrow right" id="sh-next" aria-label="Siguiente">›</button>
+      </div>
+    </section>
+
+    <section class="panel showcase-panel" style="margin-top:26px">
+      <div class="showcase-head">
+        <div class="sh-spacer"></div>
+        <div class="sh-center">
+          <div class="eyebrow">COLECCIÓN ILUSTRADA</div>
+          <h2>ARTE Y BOCETOS</h2>
+        </div>
+        <a class="continue-box" href="#/arte">
+          <div>
+            <small>GALERÍA DE WARYONI</small>
+            <b>${ART_GALLERY.length} ilustraciones y diseños</b>
+          </div>
+          <span class="arr">→</span>
+        </a>
+      </div>
+      <div class="art-preview-row">
+        ${ART_GALLERY.slice(0, 4).map(a => `
+          <a class="hc-book obsidian mini-art" href="#/arte">
+            <div class="hc-spine"></div>
+            <div class="hc-frame">
+              <img src="${a.src}" alt="${esc(a.title)}" class="hc-art">
+              <div class="hc-shade"></div>
+              <div class="hc-caption">
+                <h3>${esc(a.title)}</h3>
+                <small>${esc(a.tag)}</small>
+              </div>
+            </div>
+          </a>`).join("")}
+      </div>
+    </section>`;
+
+  const row = document.getElementById("hc-row");
+  document.getElementById("sh-prev").onclick = () => row.scrollBy({ left: -240, behavior: "smooth" });
+  document.getElementById("sh-next").onclick = () => row.scrollBy({ left: 240, behavior: "smooth" });
 }
 
 function viewArt() {
