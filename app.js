@@ -358,8 +358,160 @@ async function viewCredits() {
     </section>`;
 }
 
+let codexCat = "todos";
+let codexQuery = "";
+let codexSafeMode = false;
+
+function viewCodex() {
+  const rd = new Set(store.get("nread", []));
+  const lastCap = store.get("nlastcap", 0) || 0;
+  const maxUnlocked = Math.max(12, lastCap, ...(rd.size ? [...rd] : [12]));
+
+  const cats = [
+    ["todos", "✦ Todos (" + CODEX_ENTRIES.length + ")"],
+    ["personajes", "👤 Personajes"],
+    ["clanes", "🛡️ Los 5 Clanes"],
+    ["bestiario", "🐺 Bestiario y Aries"],
+    ["mundo", "✨ Magia y Mundo"]
+  ];
+
+  const q = codexQuery.trim().toLowerCase();
+  const filtered = CODEX_ENTRIES.filter(item => {
+    if (codexCat !== "todos" && item.cat !== codexCat) return false;
+    if (q) {
+      const hay = `${item.name} ${item.title} ${item.affiliation} ${item.magic} ${item.short} ${item.lore} ${(item.tags || []).join(" ")}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  app.innerHTML = head("Grimorio Oficial de Velztek", "Códice y Bestiario") + `
+    <p class="muted" style="text-align:center;margin-top:-10px">Enciclopedia interactiva de personajes, los cinco grandes clanes, la sexta Diosa Veztel y las entidades de Aries.</p>
+
+    <div class="panel codex-toolbar">
+      <div class="codex-cats">
+        ${cats.map(([k, label]) => `<button type="button" data-ccat="${k}" class="codex-tab ${codexCat === k ? "on" : ""}">${esc(label)}</button>`).join("")}
+      </div>
+      <div class="codex-controls">
+        <input id="codex-search" class="finput" value="${esc(codexQuery)}" placeholder="🔎 Buscar personaje, clan, magia o estrella de Aries…" style="margin:0;flex:1;min-width:220px">
+        <label class="codex-spoiler-toggle" title="Oculta detalles de capítulos que aún no has leído">
+          <input type="checkbox" id="codex-safe" ${codexSafeMode ? "checked" : ""}>
+          <span>🛡️ Filtro Anti-Spoilers (según mi lectura)</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="codex-grid">
+      ${filtered.map(item => {
+        const isLocked = codexSafeMode && item.firstCap > maxUnlocked;
+        const isSketch = /sketch/i.test(item.img);
+        return `
+          <article class="codex-card tier-${item.tier} ${isLocked ? "is-locked" : ""}" data-open-codex="${item.id}">
+            <div class="codex-art-wrap">
+              <img src="${item.img}" alt="${esc(item.name)}" class="codex-art ${isSketch ? "sketch-dark" : ""}">
+              <div class="codex-art-shade"></div>
+              <span class="codex-badge">${esc(item.catLabel)}</span>
+              <span class="codex-cap-pill">📖 ${esc(item.capLabel)}</span>
+            </div>
+            <div class="codex-body">
+              <h3>${esc(item.name)}</h3>
+              <div class="codex-sub">${esc(item.title)}</div>
+              ${isLocked ? `
+                <p class="codex-desc locked-msg">🔒 Aparece más adelante en tu lectura (${esc(item.capLabel)}). Haz clic si deseas desbloquear su ficha ahora.</p>
+              ` : `
+                <p class="codex-desc">${esc(item.short)}</p>
+                <div class="codex-meta">
+                  <div><small>AFILIACIÓN</small><b>${esc(item.affiliation)}</b></div>
+                  <div><small>PODER / DON</small><b>${esc(item.magic)}</b></div>
+                </div>
+                <div class="ptags" style="margin-top:10px">
+                  ${(item.tags || []).map(t => `<span>${esc(t)}</span>`).join("")}
+                </div>
+              `}
+              <div class="codex-foot">
+                <span class="codex-more-link">Abrir expediente completo →</span>
+              </div>
+            </div>
+          </article>`;
+      }).join("")}
+    </div>
+
+    <div id="codex-modal" class="codex-modal" hidden></div>`;
+
+  app.querySelectorAll("[data-ccat]").forEach(btn => {
+    btn.onclick = () => {
+      codexCat = btn.dataset.ccat;
+      viewCodex();
+    };
+  });
+
+  const sInput = document.getElementById("codex-search");
+  sInput.oninput = e => {
+    codexQuery = e.target.value;
+    const pos = sInput.selectionStart;
+    viewCodex();
+    const again = document.getElementById("codex-search");
+    if (again) { again.focus(); again.setSelectionRange(pos, pos); }
+  };
+
+  document.getElementById("codex-safe").onchange = e => {
+    codexSafeMode = e.target.checked;
+    viewCodex();
+  };
+
+  app.querySelectorAll("[data-open-codex]").forEach(card => {
+    card.onclick = () => openCodexModal(card.dataset.openCodex);
+  });
+}
+
+function openCodexModal(id) {
+  const item = CODEX_ENTRIES.find(x => x.id === id);
+  if (!item) return;
+  const modal = document.getElementById("codex-modal");
+  if (!modal) return;
+  const isSketch = /sketch/i.test(item.img);
+  modal.hidden = false;
+  modal.innerHTML = `
+    <div class="codex-dialog tier-${item.tier}">
+      <button type="button" class="codex-close" id="codex-close" aria-label="Cerrar">✕</button>
+      <div class="codex-dialog-grid">
+        <div class="codex-dialog-art">
+          <img src="${item.img}" alt="${esc(item.name)}" class="${isSketch ? "sketch-dark" : ""}">
+          <div class="ptags" style="margin-top:12px;justify-content:center">
+            ${(item.tags || []).map(t => `<span>${esc(t)}</span>`).join("")}
+          </div>
+        </div>
+        <div class="codex-dialog-info">
+          <div class="eyebrow" style="text-align:left;color:#d8b15a">${esc(item.catLabel)}</div>
+          <h2 style="margin:4px 0 4px;font-size:1.85rem;color:#f6ecd3">${esc(item.name)}</h2>
+          <div style="color:var(--gold);font-family:Marcellus,serif;font-size:.9rem;margin-bottom:14px">${esc(item.title)}</div>
+
+          <div class="codex-meta-box">
+            <div><small>LINAJE / AFILIACIÓN</small><b>${esc(item.affiliation)}</b></div>
+            <div><small>MAGIA / AFINIDAD</small><b>${esc(item.magic)}</b></div>
+            <div><small>CAPÍTULO CLAVE</small><b>${esc(item.capLabel)}</b></div>
+          </div>
+
+          <div class="codex-lore-text">
+            ${item.lore.split("\n\n").map(p => `<p>${esc(p)}</p>`).join("")}
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+            <a class="cta" href="#/leer/${item.firstCap}" style="margin:0">📖 Leer su aparición (${esc(item.capLabel)}) →</a>
+            <button type="button" class="ghost" id="codex-close-btn">Cerrar ficha</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  const close = () => { modal.hidden = true; modal.innerHTML = ""; };
+  document.getElementById("codex-close").onclick = close;
+  document.getElementById("codex-close-btn").onclick = close;
+  modal.onclick = e => { if (e.target === modal) close(); };
+}
+
 // ---------- router ----------
-const NAV = [["#/", "Inicio"], ["#/novela", "Novela"], ["#/arte", "Arte"], ["#/descargas", "Descargas"], ["#/proyectos", "Proyectos"], ["#/creditos", "Créditos"]];
+const NAV = [["#/", "Inicio"], ["#/novela", "Novela"], ["#/codice", "Códice"], ["#/arte", "Arte"], ["#/descargas", "Descargas"], ["#/proyectos", "Proyectos"], ["#/creditos", "Créditos"]];
 function route() {
   const h = location.hash || "#/";
   const [r, a] = h.slice(2).split("/");
@@ -368,6 +520,7 @@ function route() {
   if (r === "novela") viewNovelsHub(+a || 1);
   else if (r === "volumen") viewNovelVolume(+a || 1);
   else if (r === "leer") viewLeer(+a || 1);
+  else if (r === "codice") viewCodex();
   else if (r === "arte") viewArt();
   else if (r === "cuenta") renderAuthView();
   else if (r === "descargas") viewDownloads();
