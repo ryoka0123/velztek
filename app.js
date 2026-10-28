@@ -243,8 +243,116 @@ function viewProjects() {
   });
 }
 
-function viewCredits() {
-  app.innerHTML = head("Archivo arcano", "Créditos") + `<div class="panel">${CREDITS.map(([r, n]) => `<div class="dl"><span class="cinzel" style="font-size:.8rem;color:var(--gold)">${r}</span><span>${n}</span></div>`).join("")}</div>`;
+async function viewCredits() {
+  const mf = await loadNovel();
+  const chs = mf?.chapters || [];
+  const totalWords = chs.reduce((a, c) => a + (c.words || 0), 0);
+
+  const TEAM_ROLES = [
+    {
+      role: "HISTORIA ORIGINAL Y MUNDO",
+      name: "WARYONI",
+      sub: "Autor y creador del universo de Velztek",
+      avatar: "novela/cover.jpg",
+      desc: "Creación de la trama, el Gran Bosque de Aries, el sistema de los cinco clanes (Kraniel, Kitsune, Nillion, Urlier y Nevorv), la mitología de la sexta Diosa Veztel y los 84 capítulos e interludios publicados."
+    },
+    {
+      role: "DIRECCIÓN Y EDICIÓN WEB",
+      name: "Archivo de Velztek",
+      sub: "Maquetación, adaptación y preservación digital",
+      avatar: "novela/art/clan.jpg",
+      desc: "Organización de la obra en 6 volúmenes encuadernados, limpieza tipográfica de las 84 partes del EPUB, compendio de glosario, sistema de cuentas de lector y sincronización de progreso."
+    },
+    {
+      role: "ARTE E ILUSTRACIÓN DE PERSONAJES",
+      name: "Colección Oficial Velztek",
+      sub: "Portada, arte a color y bocetos conceptuales",
+      avatar: "novela/art/flor.jpg",
+      desc: "Diseño visual de Nylie Kraniel, Diana Kraniel, las herederas del clan, atuendos, marcas arcanas y escenas clave que dan vida a cada volumen."
+    },
+    {
+      role: "AUDIOLIBRO Y TECNOLOGÍA INTERACTIVA",
+      name: "Motor Híbrido Neural",
+      sub: "Narración por voz, búsqueda y lectura inmersiva",
+      avatar: "novela/art/sketch2.jpg",
+      desc: "Integración de consola flotante de audiolibro con voces neuronales en español, resaltado de párrafos en vivo, cuatro temas de papel y guardado automático de posición."
+    }
+  ];
+
+  constTIMELINE = [
+    { badge: "ORIGEN", title: "Publicación en Wattpad", detail: "Inicio de la travesía de Izaki y Nylie en el Gran Bosque de Aries bajo la pluma de WARYONI." },
+    { badge: "PRIMERA ETAPA", title: "Capítulos 0 al 50 + Epílogos", detail: "Consolidación del clan Kraniel, el Torneo de Clases, la identidad de Nylie y el cierre del primer gran arco." },
+    { badge: "ARCO ACTUAL", title: "Capítulos 51 al 70 · Carnero Carmesí", detail: "Expansión hacia el Aura, la Herencia, el duelo de carneros y las cuatro entidades estelares (Hamal, Bharani, Mesart y Botein)." },
+    { badge: "EDICIÓN WEB", title: "Biblioteca Interactiva de Velztek", detail: "Lanzamiento de esta plataforma dedicada para leer, escuchar y guardar el progreso volumen a volumen." }
+  ];
+
+  app.innerHTML = head("Archivo de Velztek", "Créditos") + `
+    <p class="muted" style="text-align:center;margin-top:-10px">Reconocimiento a quienes dan vida a la historia, el arte y la edición interactiva de Velztek.</p>
+
+    <section class="panel cred-hero">
+      <div class="cred-hero-art">
+        <img src="novela/cover.jpg" alt="Velztek · WARYONI" class="cred-main-img">
+        <span class="cred-seal">✦ OBRA AUTORIZADA</span>
+      </div>
+      <div class="cred-hero-body">
+        <div class="eyebrow" style="text-align:left;color:#d8b15a">AUTORÍA PRINCIPAL · UNIVERSO ORIGINAL</div>
+        <h2>WARYONI</h2>
+        <p class="cred-quote">«Un bosque inmenso estaba delante de sus ojos y una vida nueva de la cual no se sabía quién era la protagonista. Dos almas unidas en busca de una nueva oportunidad en un mundo de fantasía.»</p>
+        <p class="muted" style="line-height:1.65;margin:10px 0 16px">Esta plataforma fue creada con el permiso directo de su autor para ofrecer a los lectores de <b>Velztek</b> una experiencia de lectura digna de un libro de fantasía: sin anuncios, con seguimiento de capítulos, glosario del mundo y modo audiolibro.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="cta" href="https://www.wattpad.com/story/254954178-velztek" target="_blank" rel="noopener" style="margin:0">★ Apoyar la obra original en Wattpad →</a>
+          <a class="ghost" href="#/novela" style="padding:12px 18px">Explorar los 6 Volúmenes</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="cred-stats">
+      <div class="stat-card"><small>CAPÍTULOS Y EXTRAS</small><b>${chs.length || 84}</b><span>Partes completas cargadas</span></div>
+      <div class="stat-card"><small>EXTENSIÓN TOTAL</small><b>${(totalWords || 255000).toLocaleString("es")}</b><span>Palabras en español</span></div>
+      <div class="stat-card"><small>VOLÚMENES WEB</small><b>6 Tomos</b><span>Con índice y audiolibro</span></div>
+      <div class="stat-card"><small>LECTURA EN VOZ</small><b>~${Math.round((totalWords || 255000) / 12000)} h</b><span>Duración de audiolibro</span></div>
+    </div>
+
+    <section class="panel" style="margin-top:22px">
+      <div class="eyebrow">EQUIPO Y PILARES DEL PROYECTO</div>
+      <h3 style="text-align:center;font-size:1.55rem;margin:6px 0 20px;color:#f4e8c8">ROLES Y PRODUCCIÓN</h3>
+      <div class="cred-grid">
+        ${TEAM_ROLES.map(t => `
+          <div class="cred-card">
+            <div class="cred-card-head">
+              <img src="${t.avatar}" alt="${esc(t.name)}" class="cred-ava">
+              <div>
+                <small>${esc(t.role)}</small>
+                <h4>${esc(t.name)}</h4>
+                <span>${esc(t.sub)}</span>
+              </div>
+            </div>
+            <p>${esc(t.desc)}</p>
+          </div>`).join("")}
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:22px">
+      <div class="eyebrow">HISTORIAL DE LA EDICIÓN</div>
+      <h3 style="text-align:center;font-size:1.55rem;margin:6px 0 20px;color:#f4e8c8">CRONOLOGÍA DE VELZTEK</h3>
+      <div class="cred-timeline">
+        ${constTIMELINE.map(item => `
+          <div class="tl-item">
+            <span class="tl-badge">${esc(item.badge)}</span>
+            <div>
+              <b>${esc(item.title)}</b>
+              <p class="muted" style="margin:4px 0 0;font-size:.92rem">${esc(item.detail)}</p>
+            </div>
+          </div>`).join("")}
+      </div>
+    </section>
+
+    <section class="panel cred-legal" style="margin-top:22px;text-align:center">
+      <div class="eyebrow">DERECHOS Y RECONOCIMIENTOS</div>
+      <p class="muted" style="max-width:740px;margin:8px auto 0;font-size:.9rem;line-height:1.65">
+        <b>Velztek</b>, sus personajes (<i>Nylie Kraniel, Izaki, Lylia, Diana Kraniel, Fayna Kitsune, Kelly Nillion, Azari, Sherat, Bharani</i> y demás integrantes de los clanes) e ilustraciones pertenecen a <b>WARYONI</b>. Sitio desarrollado sin fines de lucro para la comunidad de lectores.
+      </p>
+    </section>`;
 }
 
 // ---------- router ----------

@@ -456,3 +456,31 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .proj-showcase { padding-top:16px; }
 .proj-sh-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
 .ba-right { background:rgba(38,78,56,.18) !important; border-color:rgba(143,209,158,.32) !important; }
+
+/* Página de Créditos enriquecida */
+.cred-hero { display:flex; gap:28px; align-items:center; flex-wrap:wrap; padding:30px; background:linear-gradient(135deg, rgba(16,20,34,.94), rgba(28,14,22,.9)); border:1px solid rgba(216,177,90,.38); }
+.cred-hero-art { position:relative; flex:none; margin:0 auto; }
+.cred-main-img { width:185px; aspect-ratio:2/3; object-fit:cover; border-radius:10px; border:2px solid #d8b15a; box-shadow:0 14px 36px rgba(0,0,0,.85); display:block; }
+.cred-seal { position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); white-space:nowrap;
+  background:linear-gradient(180deg,#e0b863,#a87b28); color:#1e1205; font-family:Marcellus,serif; font-size:.58rem; font-weight:600;
+  letter-spacing:.16em; padding:4px 12px; border-radius:12px; box-shadow:0 4px 12px #000a; }
+.cred-hero-body { flex:1; min-width:260px; }
+.cred-hero-body h2 { font-size:clamp(1.8rem,4vw,2.6rem); margin:4px 0 10px; color:#f6ecd3; letter-spacing:.1em; }
+.cred-quote { font-style:italic; color:#e6d6b5; border-left:3px solid #d8b15a; padding:6px 0 6px 14px; margin:8px 0; line-height:1.6; background:rgba(216,177,90,.06); border-radius:0 6px 6px 0; }
+
+.cred-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(185px, 1fr)); gap:14px; margin-top:20px; }
+.cred-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:16px; }
+.cred-card { border:1px solid var(--line); border-radius:12px; padding:18px; background:rgba(7,10,20,.68); transition:border-color .2s, transform .2s; }
+.cred-card:hover { border-color:#d8b15a; transform:translateY(-3px); }
+.cred-card-head { display:flex; gap:14px; align-items:center; margin-bottom:10px; }
+.cred-ava { width:58px; height:58px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); flex:none; }
+.cred-card-head small { display:block; font-family:Marcellus,serif; font-size:.56rem; letter-spacing:.18em; color:#d8b15a; }
+.cred-card-head h4 { margin:2px 0; font-size:1.15rem; color:#f4e8c8; }
+.cred-card-head span { font-size:.8rem; color:var(--muted); }
+.cred-card p { margin:0; font-size:.92rem; color:var(--ink); opacity:.88; line-height:1.6; }
+
+.cred-timeline { display:grid; gap:12px; }
+.tl-item { display:flex; gap:16px; align-items:flex-start; padding:14px 16px; border:1px solid var(--line); border-radius:10px; background:rgba(7,10,20,.55); }
+.tl-badge { font-family:Marcellus,serif; font-size:.6rem; letter-spacing:.16em; color:#1e1205; background:linear-gradient(180deg,#e0b863,#b08430);
+  padding:4px 10px; border-radius:6px; flex:none; font-weight:600; margin-top:2px; }
+.tl-item b { font-family:Marcellus,serif; color:#f4e8c8; font-size:1rem; letter-spacing:.05em; }
