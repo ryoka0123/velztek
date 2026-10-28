@@ -1,4 +1,4 @@
-// Novela: catálogo de novelas/volúmenes, libro ornamentado, lector con guardado de posición y marcadores.
+﻿// Novela: catálogo de novelas/volúmenes, libro ornamentado, lector con guardado de posición y marcadores.
 let NOVEL = null;
 let scrollHandler = null;
 
@@ -217,7 +217,7 @@ async function viewNovelVolume(vn = 1) {
       const set = new Set(store.get("nread", []));
       if (set.has(targetN)) set.delete(targetN);
       else set.add(targetN);
-      store.set("nread", [...set]);
+      store.set("nread", [...set]); if (typeof syncProgressToUser === "function") syncProgressToUser();
       store.set("nlast", new Date().toLocaleDateString("es"));
       store.set("nlastcap", targetN);
       viewNovelVolume(vn);
@@ -228,7 +228,7 @@ async function viewNovelVolume(vn = 1) {
     const set = new Set(store.get("nread", []));
     const allDone = listToShow.every(c => set.has(c.n));
     listToShow.forEach(c => allDone ? set.delete(c.n) : set.add(c.n));
-    store.set("nread", [...set]);
+    store.set("nread", [...set]); if (typeof syncProgressToUser === "function") syncProgressToUser();
     store.set("nlast", new Date().toLocaleDateString("es"));
     viewNovelVolume(vn);
   };
@@ -265,7 +265,7 @@ async function viewLeer(cn) {
   const wordCount = c.words || body.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
 
   // Guardar lectura actual y fecha
-  const rd = new Set(store.get("nread", [])); rd.add(cn); store.set("nread", [...rd]);
+  const rd = new Set(store.get("nread", [])); rd.add(cn); store.set("nread", [...rd]); if (typeof syncProgressToUser === "function") syncProgressToUser();
   store.set("nlast", new Date().toLocaleDateString("es"));
   store.set("nlastcap", cn);
 
@@ -343,7 +343,7 @@ async function viewLeer(cn) {
   document.getElementById("btnbm").onclick = e => {
     const bm = new Set(store.get("nbookmarks", []));
     bm.has(cn) ? bm.delete(cn) : bm.add(cn);
-    store.set("nbookmarks", [...bm]);
+    store.set("nbookmarks", [...bm]); if (typeof syncProgressToUser === "function") syncProgressToUser();
     e.currentTarget.classList.toggle("active", bm.has(cn));
   };
 
@@ -388,7 +388,7 @@ async function viewLeer(cn) {
     if (spct) spct.textContent = Math.round(ratio * 100) + "%";
     const map = store.get("nscroll", {});
     map[cn] = +ratio.toFixed(3);
-    store.set("nscroll", map);
+    store.set("nscroll", map); if (typeof syncProgressToUser === "function") syncProgressToUser();
   };
   window.addEventListener("scroll", scrollHandler, { passive: true });
 }
@@ -497,7 +497,7 @@ async function viewAccount() {
     const target = +document.getElementById("uptosel").value;
     const set = new Set();
     chs.forEach(c => { if (c.n <= target) set.add(c.n); });
-    store.set("nread", [...set]);
+    store.set("nread", [...set]); if (typeof syncProgressToUser === "function") syncProgressToUser();
     store.set("nlastcap", target);
     store.set("nlast", new Date().toLocaleDateString("es"));
     viewAccount();
@@ -529,3 +529,4 @@ async function viewAccount() {
     }
   };
 }
+

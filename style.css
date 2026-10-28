@@ -280,3 +280,23 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .stat-card small { display:block; font-family:Marcellus,serif; font-size:.6rem; letter-spacing:.2em; color:var(--muted); }
 .stat-card b { display:block; font-family:Marcellus,serif; font-size:1.9rem; color:var(--gold); margin:4px 0; }
 .stat-card span { font-size:.82rem; color:var(--muted); }
+
+/* login y registro */
+.auth-wrap { max-width:460px; margin:0 auto; }
+.auth-card { padding:28px; }
+.auth-tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:18px; }
+.auth-tabs button { padding:10px; font-family:Marcellus,serif; text-transform:uppercase; letter-spacing:.1em; background:#0d1222; color:var(--muted); border:1px solid var(--line); border-radius:8px; cursor:pointer; }
+.auth-tabs button.on { background:linear-gradient(180deg,#1d6f7a,#12384a); color:#fff; border-color:var(--gold); }
+.flabel { display:block; font-family:Marcellus,serif; font-size:.65rem; letter-spacing:.18em; color:var(--muted); margin:12px 0 5px; }
+.finput { width:100%; padding:10px 12px; background:#0b1020; color:var(--ink); border:1px solid var(--line); border-radius:8px; font-family:inherit; }
+.finput:focus { outline:none; border-color:var(--gold); }
+.ava-grid { display:flex; gap:10px; flex-wrap:wrap; margin:6px 0 4px; }
+.ava-pick { width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid transparent; cursor:pointer; opacity:.65; transition:all .15s; }
+.ava-pick.small { width:36px; height:36px; }
+.ava-pick:hover, .ava-pick.on { opacity:1; border-color:var(--gold); transform:scale(1.06); }
+.prof-ava { width:84px; height:84px; border-radius:50%; object-fit:cover; border:2px solid var(--gold); box-shadow:0 6px 18px #000a; }
+.nav-ava { width:22px; height:22px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:6px; border:1px solid var(--gold); }
+#account-btn { display:inline-flex; align-items:center; gap:4px; }
+.auth-err { margin-top:12px; padding:9px 12px; border-radius:8px; background:rgba(200,50,70,.2); border:1px solid #c84b61; color:#ffb3c0; font-size:.88rem; }
+.auth-foot { display:flex; justify-content:center; gap:8px; align-items:center; margin-top:14px; font-size:.9rem; }
+.link-btn { background:none; border:none; color:var(--gold); cursor:pointer; text-decoration:underline; font:inherit; padding:0; }
