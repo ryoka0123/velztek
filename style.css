@@ -266,3 +266,17 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .swatches button { border:2px solid #3a3228; border-radius:10px; padding:10px 0; cursor:pointer; font-family:Lora,serif; font-size:1.1rem; }
 .swatches button small { font-size:.6rem; } .swatches button.on { border-color:#d9a441; box-shadow:0 0 0 1px #d9a441; }
 @media (max-width:780px) { .tome { grid-template-columns:1fr; } .spine { display:none; } .page.p-left,.page.p-right { border-radius:6px; } .sheet { padding:28px 20px; } }
+
+/* progreso de lectura y cuenta */
+.read-progress { position:fixed; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,.08); z-index:40; }
+.read-progress-bar { height:100%; width:0%; background:linear-gradient(90deg,var(--gold2),var(--gold)); transition:width .1s; }
+.ch-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 10px; border-bottom:1px solid rgba(138,101,48,.35); border-radius:4px; transition:background .15s; }
+.ch-row:hover, .ch-row.active { background:rgba(138,101,48,.16); }
+.ch-link { flex:1; min-width:0; display:block; }
+.ch-link em { font-style:normal; color:#8a3528; }
+.page button.dot { cursor:pointer; padding:0; flex:none; transition:transform .12s; }
+.page button.dot:hover { transform:scale(1.2); border-color:#38230e; }
+.stat-card { border:1px solid var(--line); border-radius:12px; padding:16px; background:rgba(5,8,18,.65); text-align:center; }
+.stat-card small { display:block; font-family:Marcellus,serif; font-size:.6rem; letter-spacing:.2em; color:var(--muted); }
+.stat-card b { display:block; font-family:Marcellus,serif; font-size:1.9rem; color:var(--gold); margin:4px 0; }
+.stat-card span { font-size:.82rem; color:var(--muted); }

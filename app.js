@@ -91,6 +91,7 @@ function route() {
   else if (r === "volumen") viewNovelVolume(+a || 1);
   else if (r === "leer") viewLeer(+a || 1);
   else if (r === "arte") viewArt();
+  else if (r === "cuenta") viewAccount();
   else if (r === "descargas") viewDownloads();
   else if (r === "proyectos") viewProjects();
   else if (r === "creditos") viewCredits();
