@@ -1,5 +1,6 @@
-// Reproductor flotante de Audiolibro con selección de la mejor voz Neural/Natural en español,
-// lectura párrafo por párrafo, resaltado en vivo, control de tiempo, velocidad, volumen y descarga.
+// Reproductor flotante de Audiolibro con Motor Híbrido:
+// 1) Voces Neuronales Cloud en Español (alta naturalidad, vía StreamElements / Google Translate TTS chunking)
+// 2) Voces Neuronales nativas (Microsoft Natural / Google) + modelado prosódico de diálogos y narración.
 
 let ttsState = {
   active: false,
@@ -9,13 +10,25 @@ let ttsState = {
   idx: 0,
   rate: 1.0,
   vol: 1.0,
-  voiceURI: "",
+  voiceURI: "cloud:Mia",
   totalSec: 0,
   paraSec: [],
   cumSec: [],
   timer: null,
-  paraElapsed: 0
+  paraElapsed: 0,
+  audioEl: null,
+  abortCtrl: null
 };
+
+// Voces en la nube (Amazon Polly Neural / Google Cloud TTS vía endpoints públicos sin API key)
+const CLOUD_VOICES = [
+  { id: "cloud:Mia", label: "★ IA Neural · Mía (Femenina · México, cálida)", lang: "es-MX", voice: "Mia" },
+  { id: "cloud:Lucia", label: "★ IA Neural · Lucía (Femenina · España, clara)", lang: "es-ES", voice: "Lucia" },
+  { id: "cloud:Lupe", label: "★ IA Neural · Lupe (Femenina · Latinoamérica)", lang: "es-US", voice: "Lupe" },
+  { id: "cloud:Conchita", label: "★ IA Neural · Conchita (Narradora clásica)", lang: "es-ES", voice: "Conchita" },
+  { id: "cloud:Enrique", label: "★ IA Neural · Enrique (Masculina · Narrador)", lang: "es-ES", voice: "Enrique" },
+  { id: "cloud:Miguel", label: "★ IA Neural · Miguel (Masculina · Latinoamérica)", lang: "es-US", voice: "Miguel" }
+];
 
 function fmtClock(sec) {
   const s = Math.max(0, Math.round(sec));
@@ -24,7 +37,6 @@ function fmtClock(sec) {
   return `${m}:${r}`;
 }
 
-// Ordena las voces en español priorizando voces "Natural", "Online", "Neural", "Google", "Sabina", "Dalia", "Elena", "Alvaro"
 function getSpanishVoices() {
   if (!("speechSynthesis" in window)) return [];
   const all = speechSynthesis.getVoices() || [];
@@ -32,9 +44,9 @@ function getSpanishVoices() {
   const score = v => {
     const n = (v.name + " " + v.lang).toLowerCase();
     let s = 0;
-    if (n.includes("natural") || n.includes("neural") || n.includes("online")) s += 50;
-    if (n.includes("dalia") || n.includes("elvira") || n.includes("salome") || n.includes("camila") || n.includes("sabina") || n.includes("helena") || n.includes("paulina")) s += 25;
-    if (n.includes("google")) s += 20;
+    if (n.includes("natural") || n.includes("neural") || n.includes("online")) s += 60;
+    if (n.includes("dalia") || n.includes("elvira") || n.includes("salome") || n.includes("camila") || n.includes("paloma") || n.includes("ximena")) s += 30;
+    if (n.includes("google")) s += 25;
     if (n.includes("microsoft")) s += 15;
     if (/es[-_](mx|co|ar|lat|419|es|pe|cl)/i.test(v.lang)) s += 10;
     return s;
@@ -42,19 +54,53 @@ function getSpanishVoices() {
   return es.sort((a, b) => score(b) - score(a));
 }
 
-// Limpia el texto del párrafo para que la voz suene expresiva y sin signos raros
 function cleanTextForSpeech(raw) {
   return String(raw || "")
     .replace(/^[—–-]\s*/gm, "")
     .replace(/\s*[—–]\s*/g, ", ")
-    .replace(/\.{2,}/g, "… ")
+    .replace(/\.{2,}/g, "... ")
     .replace(/[*#_~`]+/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-function stopAudiobook(hidePanel = false) {
+// Divide un párrafo en oraciones naturales para que la entonación humana respire en cada punto o diálogo
+function splitSentences(text, maxLen = 220) {
+  const cleaned = cleanTextForSpeech(text);
+  if (!cleaned) return [];
+  const rawParts = cleaned.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) || [cleaned];
+  const chunks = [];
+  let buf = "";
+  for (const part of rawParts) {
+    const p = part.trim();
+    if (!p) continue;
+    if ((buf + " " + p).trim().length <= maxLen) {
+      buf = (buf ? buf + " " : "") + p;
+    } else {
+      if (buf) chunks.push(buf);
+      if (p.length <= maxLen) buf = p;
+      else {
+        const sub = p.match(new RegExp(`.{1,${maxLen}}(\\s|$)`, "g")) || [p];
+        sub.forEach(s => chunks.push(s.trim()));
+        buf = "";
+      }
+    }
+  }
+  if (buf) chunks.push(buf);
+  return chunks;
+}
+
+function stopCurrentAudio() {
   if ("speechSynthesis" in window) speechSynthesis.cancel();
+  if (ttsState.audioEl) {
+    try { ttsState.audioEl.pause(); ttsState.audioEl.src = ""; } catch {}
+    ttsState.audioEl = null;
+  }
   if (ttsState.timer) { clearInterval(ttsState.timer); ttsState.timer = null; }
+}
+
+function stopAudiobook(hidePanel = false) {
+  stopCurrentAudio();
   ttsState.playing = false;
   ttsState.paused = false;
   document.querySelectorAll("#txt p.tts-reading").forEach(el => el.classList.remove("tts-reading"));
@@ -91,7 +137,7 @@ function updatePlayerUI() {
     seekEl.value = ttsState.idx;
   }
   if (statusEl) {
-    if (ttsState.playing) statusEl.textContent = `Escuchando párrafo ${ttsState.idx + 1} de ${ttsState.paras.length}`;
+    if (ttsState.playing) statusEl.textContent = `Narrando párrafo ${ttsState.idx + 1} de ${ttsState.paras.length}`;
     else if (ttsState.paused) statusEl.textContent = `En pausa · Párrafo ${ttsState.idx + 1} de ${ttsState.paras.length}`;
     else statusEl.textContent = "Listo para escuchar (haz clic en cualquier párrafo o en ▶)";
   }
@@ -106,10 +152,64 @@ function highlightCurrentPara(scrollInto = true) {
   }
 }
 
+// Reproduce una lista de frases con la voz en la nube (StreamElements Polly Neural); si falla o no hay internet, cae automáticamente al navegador con prosodia mejorada
+async function playCloudParagraph(sentences, voiceName, onDone) {
+  for (let sIdx = 0; sIdx < sentences.length; sIdx++) {
+    if (!ttsState.playing) return;
+    const phrase = sentences[sIdx];
+    const url = `https://api.streamelements.com/kappa/v2/speech?voice=${encodeURIComponent(voiceName)}&text=${encodeURIComponent(phrase)}`;
+    const ok = await new Promise(resolve => {
+      const audio = new Audio(url);
+      ttsState.audioEl = audio;
+      audio.volume = ttsState.vol;
+      audio.playbackRate = ttsState.rate;
+      audio.onended = () => resolve(true);
+      audio.onerror = () => resolve(false);
+      audio.play().catch(() => resolve(false));
+    });
+    if (!ok) {
+      // Fallback inmediato a síntesis expresiva local si el navegador bloquea o no hay red
+      speakLocalParagraph(sentences.slice(sIdx), onDone);
+      return;
+    }
+  }
+  if (ttsState.playing) onDone();
+}
+
+// Síntesis local mejorada: ajusta dinámicamente tono y cadencia en diálogos, preguntas y exclamaciones para quitar lo robótico
+function speakLocalParagraph(sentences, onDone) {
+  if (!("speechSynthesis" in window)) { onDone(); return; }
+  const voices = getSpanishVoices();
+  const chosen = voices.find(v => v.voiceURI === ttsState.voiceURI) || voices[0];
+  let sIdx = 0;
+
+  const nextSentence = () => {
+    if (!ttsState.playing) return;
+    if (sIdx >= sentences.length) { onDone(); return; }
+    const phrase = sentences[sIdx++];
+    const u = new SpeechSynthesisUtterance(phrase);
+    if (chosen) { u.voice = chosen; u.lang = chosen.lang; }
+    else u.lang = "es-MX";
+
+    // Modelado prosódico humano según el tipo de oración
+    const isQuestion = /[?¿]/.test(phrase);
+    const isExclam = /[!¡]/.test(phrase);
+    u.rate = ttsState.rate * (isExclam ? 1.04 : 0.98);
+    u.pitch = isQuestion ? 1.08 : isExclam ? 1.06 : 1.02;
+    u.volume = ttsState.vol;
+
+    u.onend = () => {
+      if (!ttsState.playing) return;
+      setTimeout(nextSentence, 90); // micropausa de respiración entre frases
+    };
+    u.onerror = () => { if (ttsState.playing) nextSentence(); };
+    speechSynthesis.speak(u);
+  };
+  nextSentence();
+}
+
 function speakCurrentPara() {
-  if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  if (ttsState.timer) { clearInterval(ttsState.timer); ttsState.timer = null; }
+  stopCurrentAudio();
 
   if (ttsState.idx < 0) ttsState.idx = 0;
   if (ttsState.idx >= ttsState.paras.length) {
@@ -119,8 +219,9 @@ function speakCurrentPara() {
   }
 
   const el = ttsState.paras[ttsState.idx];
-  const text = cleanTextForSpeech(el.innerText);
-  if (!text) {
+  const raw = (el.innerText || "").trim();
+  const sentences = splitSentences(raw);
+  if (!sentences.length) {
     ttsState.idx++;
     speakCurrentPara();
     return;
@@ -131,19 +232,6 @@ function speakCurrentPara() {
   ttsState.paused = false;
   ttsState.paraElapsed = 0;
 
-  const u = new SpeechSynthesisUtterance(text);
-  const voices = getSpanishVoices();
-  const chosen = voices.find(v => v.voiceURI === ttsState.voiceURI) || voices[0];
-  if (chosen) {
-    u.voice = chosen;
-    u.lang = chosen.lang;
-  } else {
-    u.lang = "es-ES";
-  }
-  u.rate = ttsState.rate;
-  u.volume = ttsState.vol;
-  u.pitch = 1.02;
-
   ttsState.timer = setInterval(() => {
     if (ttsState.playing) {
       ttsState.paraElapsed = Math.min(ttsState.paraSec[ttsState.idx] || 5, ttsState.paraElapsed + 0.5);
@@ -151,23 +239,22 @@ function speakCurrentPara() {
     }
   }, 500);
 
-  u.onend = () => {
+  updatePlayerUI();
+
+  const advanceNextPara = () => {
     if (!ttsState.playing) return;
     ttsState.idx++;
     ttsState.paraElapsed = 0;
-    if (ttsState.idx < ttsState.paras.length) {
-      speakCurrentPara();
-    } else {
-      stopAudiobook(false);
-    }
-  };
-  u.onerror = () => {
-    if (!ttsState.playing) return;
-    updatePlayerUI();
+    if (ttsState.idx < ttsState.paras.length) speakCurrentPara();
+    else stopAudiobook(false);
   };
 
-  updatePlayerUI();
-  speechSynthesis.speak(u);
+  if (String(ttsState.voiceURI).startsWith("cloud:")) {
+    const voiceName = ttsState.voiceURI.slice(6) || "Mia";
+    playCloudParagraph(sentences, voiceName, advanceNextPara);
+  } else {
+    speakLocalParagraph(sentences, advanceNextPara);
+  }
 }
 
 function mountAudiobookPlayer(meta) {
@@ -178,9 +265,8 @@ function mountAudiobookPlayer(meta) {
   ttsState.paraElapsed = 0;
   ttsState.rate = store.get("ab_rate", 1.0);
   ttsState.vol = store.get("ab_vol", 1.0);
-  ttsState.voiceURI = store.get("ab_voice", "");
+  ttsState.voiceURI = store.get("ab_voice", "cloud:Mia");
 
-  // Calcular duración estimada por párrafo (~2.6 palabras por segundo a velocidad 1x)
   let cum = 0;
   ttsState.paraSec = [];
   ttsState.cumSec = [];
@@ -193,7 +279,6 @@ function mountAudiobookPlayer(meta) {
   });
   ttsState.totalSec = cum;
 
-  // Permitir hacer clic en cualquier párrafo mientras el reproductor está abierto para saltar ahí
   paraEls.forEach((p, i) => {
     p.addEventListener("click", () => {
       const bar = document.getElementById("ab-player");
@@ -254,8 +339,8 @@ function mountAudiobookPlayer(meta) {
             </select>
           </div>
           <div class="ab-field">
-            <small>VOZ NARRADORA</small>
-            <select id="ab-voice"><option value="">Detectando voces en español…</option></select>
+            <small>VOZ</small>
+            <select id="ab-voice"></select>
           </div>
           <div class="ab-dl">
             <button type="button" id="ab-dl-cap" title="Descargar este capítulo para lectura offline">⬇ Descargar capítulo</button>
@@ -269,19 +354,30 @@ function mountAudiobookPlayer(meta) {
   const populateVoices = () => {
     const sel = document.getElementById("ab-voice");
     if (!sel) return;
-    const voices = getSpanishVoices();
-    if (!voices.length) {
-      sel.innerHTML = `<option value="">Voz predeterminada del sistema</option>`;
-      return;
+    const localVoices = getSpanishVoices();
+
+    // Si en este navegador hay una voz Microsoft Natural (Edge), la ponemos también arriba
+    const naturalLocal = localVoices.filter(v => /natural|neural|online/i.test(v.name));
+    const otherLocal = localVoices.filter(v => !/natural|neural|online/i.test(v.name));
+
+    const groups = [];
+    groups.push(`<optgroup label="Voces IA en la Nube (Recomendadas)">${CLOUD_VOICES.map(cv =>
+      `<option value="${cv.id}" ${cv.id === ttsState.voiceURI ? "selected" : ""}>${esc(cv.label)}</option>`
+    ).join("")}</optgroup>`);
+
+    if (naturalLocal.length) {
+      groups.push(`<optgroup label="Voces Neuronales del Navegador">${naturalLocal.map(v => {
+        const clean = v.name.replace(/^Microsoft\s+|Online\s*\(Natural\)\s*-\s*/gi, "");
+        return `<option value="${esc(v.voiceURI)}" ${v.voiceURI === ttsState.voiceURI ? "selected" : ""}>★ ${esc(clean)} (${v.lang})</option>`;
+      }).join("")}</optgroup>`);
     }
-    if (!ttsState.voiceURI || !voices.some(v => v.voiceURI === ttsState.voiceURI)) {
-      ttsState.voiceURI = voices[0].voiceURI;
+    if (otherLocal.length) {
+      groups.push(`<optgroup label="Voces Locales (Sin conexión)">${otherLocal.map(v => {
+        const clean = v.name.replace(/^Microsoft\s+/gi, "");
+        return `<option value="${esc(v.voiceURI)}" ${v.voiceURI === ttsState.voiceURI ? "selected" : ""}>${esc(clean)} (${v.lang})</option>`;
+      }).join("")}</optgroup>`);
     }
-    sel.innerHTML = voices.map(v => {
-      const isNatural = /natural|neural|online|google/i.test(v.name);
-      const label = `${isNatural ? "★ " : ""}${v.name.replace(/^Microsoft\s+|Online\s*\(Natural\)\s*-\s*/gi, "")} (${v.lang})`;
-      return `<option value="${esc(v.voiceURI)}" ${v.voiceURI === ttsState.voiceURI ? "selected" : ""}>${esc(label)}</option>`;
-    }).join("");
+    sel.innerHTML = groups.join("");
   };
   populateVoices();
   if ("speechSynthesis" in window) speechSynthesis.onvoiceschanged = populateVoices;
@@ -300,8 +396,7 @@ function mountAudiobookPlayer(meta) {
 
   document.getElementById("ab-play").onclick = () => {
     if (ttsState.playing) {
-      speechSynthesis.cancel();
-      if (ttsState.timer) { clearInterval(ttsState.timer); ttsState.timer = null; }
+      stopCurrentAudio();
       ttsState.playing = false;
       ttsState.paused = true;
       updatePlayerUI();
@@ -325,13 +420,13 @@ function mountAudiobookPlayer(meta) {
   document.getElementById("ab-vol").oninput = e => {
     ttsState.vol = +e.target.value;
     store.set("ab_vol", ttsState.vol);
-    if (ttsState.playing) speakCurrentPara();
+    if (ttsState.audioEl) ttsState.audioEl.volume = ttsState.vol;
   };
   document.getElementById("ab-rate").onchange = e => {
     ttsState.rate = +e.target.value;
     store.set("ab_rate", ttsState.rate);
+    if (ttsState.audioEl) ttsState.audioEl.playbackRate = ttsState.rate;
     updatePlayerUI();
-    if (ttsState.playing) speakCurrentPara();
   };
   document.getElementById("ab-voice").onchange = e => {
     ttsState.voiceURI = e.target.value;
