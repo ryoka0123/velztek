@@ -419,3 +419,31 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .ab-dl { display:flex; gap:10px; margin-left:auto; }
 .ab-dl button { background:transparent; border:none; color:#cbb78e; font-size:.75rem; cursor:pointer; padding:4px 6px; }
 .ab-dl button:hover { color:#fff; text-decoration:underline; }
+
+/* Vista previa de capítulos al pasar el mouse sobre un volumen (hover índice) */
+.vol { overflow:hidden; }
+.vol-hover { position:absolute; inset:0; z-index:4;
+  background:linear-gradient(180deg, rgba(16,13,9,.94) 0%, rgba(18,14,10,.88) 65%, rgba(12,9,6,.97) 100%);
+  border:1px solid rgba(216,174,90,.55); border-radius:inherit;
+  padding:12px 13px 10px; display:flex; flex-direction:column; justify-content:space-between;
+  opacity:0; transform:translateY(6px); transition:opacity .22s ease, transform .22s ease; pointer-events:none;
+  backdrop-filter:blur(3px); text-align:left; }
+.vol:hover .vol-hover, .hc-book:hover .vol-hover { opacity:1; transform:translateY(0); }
+.vol:hover .cap, .vol:hover .new { opacity:0; transition:opacity .15s; }
+
+.vh-head { display:flex; justify-content:space-between; align-items:center;
+  font-family:Marcellus,serif; font-size:.58rem; letter-spacing:.18em; color:#d9ad55;
+  padding-bottom:6px; border-bottom:1px solid rgba(216,174,90,.35); margin-bottom:4px; }
+.vh-list { flex:1; display:flex; flex-direction:column; justify-content:center; gap:2px; overflow:hidden; }
+.vh-item { display:flex; align-items:baseline; gap:6px; padding:3px 2px;
+  border-bottom:1px solid rgba(216,174,90,.13); font-size:.74rem; color:#f2e7ce;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.25; }
+.vh-item.done { color:#9ed9b0; }
+.vh-tag { font-family:Marcellus,serif; font-size:.58rem; font-weight:600; letter-spacing:.08em; color:#d9ad55; flex:none; }
+.vh-name { font-family:Lora,Georgia,serif; font-weight:600; overflow:hidden; text-overflow:ellipsis; }
+.vh-more { font-family:Marcellus,serif; font-size:.55rem; letter-spacing:.16em; color:#d9ad55;
+  padding:4px 6px; margin:2px 0; background:rgba(216,174,90,.12); border-top:1px solid rgba(216,174,90,.28); border-bottom:1px solid rgba(216,174,90,.28); }
+
+.vh-foot { text-align:center; padding-top:6px; border-top:1px solid rgba(216,174,90,.22); margin-top:4px; }
+.vh-vol { font-family:Marcellus,serif; font-size:.95rem; letter-spacing:.12em; color:rgba(242,231,206,.35); line-height:1; }
+.vh-foot small { display:block; font-family:Marcellus,serif; font-size:.52rem; letter-spacing:.2em; color:#cfc2a4; margin-top:3px; }

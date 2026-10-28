@@ -27,11 +27,11 @@ async function viewHome() {
   const resumeVol = volOfChapter(resumeCh.n);
 
   const HOME_BOOKS = [
-    { role: "PRINCIPAL", title: "VELZTEK", sub: "6 VOLÚMENES · 84 PARTES", cover: "novela/cover.jpg", href: "#/novela/1", tone: "blue" },
-    { role: "ARCO DEL BOSQUE", title: "EL DESPERTAR", sub: "VOLUMEN 1 · 12 PARTES", cover: "novela/art/flor.jpg", href: "#/volumen/1", tone: "emerald" },
-    { role: "LINAJE", title: "ESTILO KRANIEL", sub: "VOLUMEN 3 · 11 PARTES", cover: "novela/art/clan.jpg", href: "#/volumen/3", tone: "crimson" },
-    { role: "CLÍMAX", title: "PUNTO DE QUIEBRE", sub: "VOLUMEN 5 · 15 PARTES", cover: "novela/art/sketch2.jpg", href: "#/volumen/5", tone: "obsidian" },
-    { role: "ARCO ACTUAL", title: "CARNERO CARMESÍ", sub: "VOLUMEN 6 · 24 PARTES", cover: "novela/art/sketch3.png", href: "#/volumen/6", tone: "bronze" }
+    { role: "PRINCIPAL", title: "VELZTEK", sub: "6 VOLÚMENES · 84 PARTES", cover: "novela/cover.jpg", href: "#/novela/1", tone: "blue", vNum: 1, from: 1, to: 84 },
+    { role: "ARCO DEL BOSQUE", title: "EL DESPERTAR", sub: "VOLUMEN 1 · 12 PARTES", cover: "novela/art/flor.jpg", href: "#/volumen/1", tone: "emerald", vNum: 1, from: 1, to: 12 },
+    { role: "LINAJE", title: "ESTILO KRANIEL", sub: "VOLUMEN 3 · 11 PARTES", cover: "novela/art/clan.jpg", href: "#/volumen/3", tone: "crimson", vNum: 3, from: 24, to: 34 },
+    { role: "CLÍMAX", title: "PUNTO DE QUIEBRE", sub: "VOLUMEN 5 · 15 PARTES", cover: "novela/art/sketch2.jpg", href: "#/volumen/5", tone: "obsidian", vNum: 5, from: 46, to: 60 },
+    { role: "ARCO ACTUAL", title: "CARNERO CARMESÍ", sub: "VOLUMEN 6 · 24 PARTES", cover: "novela/art/sketch3.png", href: "#/volumen/6", tone: "bronze", vNum: 6, from: 61, to: 84 }
   ];
 
   const COMPASS_SVG = `<svg viewBox="0 0 60 60" class="b-emblem"><circle cx="30" cy="30" r="14" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="30" cy="30" r="19" fill="none" stroke="currentColor" stroke-width=".7" stroke-dasharray="2 3"/><path d="M30 4 L33 26 L56 30 L33 34 L30 56 L27 34 L4 30 L27 26 Z" fill="currentColor" opacity=".88"/></svg>`;
@@ -61,7 +61,9 @@ async function viewHome() {
       <div class="shelf-wrap">
         <button class="shelf-arrow left" id="sh-prev" aria-label="Anterior">‹</button>
         <div class="hardcover-row" id="hc-row">
-          ${HOME_BOOKS.map(b => `
+          ${HOME_BOOKS.map(b => {
+            const inVol = chs.filter(c => c.n >= b.from && c.n <= b.to);
+            return `
             <a class="hc-col" href="${b.href}">
               <div class="hc-role">${esc(b.role)}</div>
               <div class="hc-book ${b.tone}">
@@ -74,9 +76,11 @@ async function viewHome() {
                     <h3>${esc(b.title)}</h3>
                     <small>${esc(b.sub)}</small>
                   </div>
+                  ${typeof buildVolHoverOverlay === "function" ? buildVolHoverOverlay(b.vNum, inVol, rd) : ""}
                 </div>
               </div>
-            </a>`).join("")}
+            </a>`;
+          }).join("")}
         </div>
         <button class="shelf-arrow right" id="sh-next" aria-label="Siguiente">›</button>
       </div>

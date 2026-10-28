@@ -39,6 +39,46 @@ function pageFrame(content, extraClass = "") {
   </div></div>`;
 }
 
+function buildVolHoverOverlay(vNum, inVol, rd) {
+  const total = inVol.length;
+  const MAX_TOP = 6;
+  const MAX_BOT = 2;
+  let rows = [];
+
+  const renderRow = c => {
+    const pt = parseChapTitle(c.title, c.n);
+    const numMatch = pt.badge.match(/\d+/);
+    const tag = pt.badge === "PRÓLOGO" ? "" : pt.isExtra ? "EXTRA" : (numMatch ? numMatch[0] : pt.badge);
+    const isRead = rd.has(c.n);
+    return `<div class="vh-item ${isRead ? "done" : ""}">
+      ${tag ? `<span class="vh-tag">${esc(tag)}</span>` : ""}
+      <b class="vh-name">${esc(pt.badge === "PRÓLOGO" ? "Prólogo" : pt.name)}</b>
+    </div>`;
+  };
+
+  if (total <= MAX_TOP + MAX_BOT + 1) {
+    rows = inVol.map(renderRow);
+  } else {
+    const topList = inVol.slice(0, MAX_TOP).map(renderRow);
+    const botList = inVol.slice(-MAX_BOT).map(renderRow);
+    const hiddenCount = total - MAX_TOP - MAX_BOT;
+    rows = [
+      ...topList,
+      `<div class="vh-more">··· +${hiddenCount} CAPÍTULOS MÁS</div>`,
+      ...botList
+    ];
+  }
+
+  return `<div class="vol-hover">
+    <div class="vh-head"><span>ÍNDICE</span><span>${total} CAPÍTULOS</span></div>
+    <div class="vh-list">${rows.join("")}</div>
+    <div class="vh-foot">
+      <div class="vh-vol">VOLUMEN ${vNum}</div>
+      <small>VER LOS ${total} CAPÍTULOS</small>
+    </div>
+  </div>`;
+}
+
 // Vista 1: Catálogo de Novelas (carrusel superior + ficha + cuadrícula de los 6 volúmenes)
 async function viewNovelsHub(sid = 1) {
   const mf = await loadNovel();
@@ -87,6 +127,7 @@ async function viewNovelsHub(sid = 1) {
             <img src="${vCover}" alt="Volumen ${v.n}">
             <span class="new">${vPct > 0 ? `${vPct}% LEÍDO` : `${inVol.length} PARTES`}</span>
             <div class="cap">VOLUMEN ${v.n}<small>${esc(v.label || `${inVol.length} CAPÍTULOS`)}</small></div>
+            ${buildVolHoverOverlay(v.n, inVol, rd)}
           </a>`;
         }).join("")}
       </div>
