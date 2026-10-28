@@ -39,20 +39,21 @@ function pageFrame(content, extraClass = "") {
   </div></div>`;
 }
 
-function buildVolHoverOverlay(vNum, inVol, rd) {
+function buildVolHoverOverlay(vNum, inVol, rd, customFoot = "") {
   const total = inVol.length;
-  const MAX_TOP = 6;
-  const MAX_BOT = 2;
+  const MAX_TOP = 4;
+  const MAX_BOT = 1;
   let rows = [];
 
   const renderRow = c => {
     const pt = parseChapTitle(c.title, c.n);
     const numMatch = pt.badge.match(/\d+/);
-    const tag = pt.badge === "PRÓLOGO" ? "" : pt.isExtra ? "EXTRA" : (numMatch ? numMatch[0] : pt.badge);
+    const tag = pt.badge === "PRÓLOGO" ? "00" : pt.isExtra ? "★" : (numMatch ? String(numMatch[0]).padStart(2, "0") : "");
     const isRead = rd.has(c.n);
+    const label = pt.badge === "PRÓLOGO" ? "Prólogo" : pt.name;
     return `<div class="vh-item ${isRead ? "done" : ""}">
       ${tag ? `<span class="vh-tag">${esc(tag)}</span>` : ""}
-      <b class="vh-name">${esc(pt.badge === "PRÓLOGO" ? "Prólogo" : pt.name)}</b>
+      <b class="vh-name">${esc(label)}</b>
     </div>`;
   };
 
@@ -64,17 +65,18 @@ function buildVolHoverOverlay(vNum, inVol, rd) {
     const hiddenCount = total - MAX_TOP - MAX_BOT;
     rows = [
       ...topList,
-      `<div class="vh-more">··· +${hiddenCount} CAPÍTULOS MÁS</div>`,
+      `<div class="vh-more">+${hiddenCount} CAPÍTULOS MÁS</div>`,
       ...botList
     ];
   }
 
+  const footLabel = customFoot || `VOLUMEN ${vNum}`;
   return `<div class="vol-hover">
-    <div class="vh-head"><span>ÍNDICE</span><span>${total} CAPÍTULOS</span></div>
+    <div class="vh-head"><span>ÍNDICE</span><span>${total} PARTES</span></div>
     <div class="vh-list">${rows.join("")}</div>
     <div class="vh-foot">
-      <div class="vh-vol">VOLUMEN ${vNum}</div>
-      <small>VER LOS ${total} CAPÍTULOS</small>
+      <div class="vh-vol">${esc(footLabel)}</div>
+      <small>ABRIR ${total} CAPÍTULOS →</small>
     </div>
   </div>`;
 }
@@ -123,8 +125,9 @@ async function viewNovelsHub(sid = 1) {
           const doneInVol = inVol.filter(c => rd.has(c.n)).length;
           const vPct = inVol.length ? Math.round((doneInVol / inVol.length) * 100) : 0;
           const vCover = v.cover || ph(s.title, "Volumen " + v.n, s.hue + v.n * 18);
+          const isSketch = /sketch/i.test(vCover);
           return `<a class="vol" href="#/volumen/${v.n}">
-            <img src="${vCover}" alt="Volumen ${v.n}">
+            <img src="${vCover}" alt="Volumen ${v.n}" class="${isSketch ? "sketch-dark" : ""}">
             <span class="new">${vPct > 0 ? `${vPct}% LEÍDO` : `${inVol.length} PARTES`}</span>
             <div class="cap">VOLUMEN ${v.n}<small>${esc(v.label || `${inVol.length} CAPÍTULOS`)}</small></div>
             ${buildVolHoverOverlay(v.n, inVol, rd)}

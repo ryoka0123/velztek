@@ -315,12 +315,12 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .continue-box b em { font-style:normal; color:var(--muted); font-weight:400; }
 .continue-box .arr { color:#d4af5f; font-size:1rem; }
 
-.shelf-wrap { position:relative; display:flex; align-items:center; }
-.shelf-arrow { width:32px; height:68px; background:rgba(18,15,10,.85); border:1px solid rgba(212,175,95,.38); color:#d4af5f; font-size:1.3rem; cursor:pointer; border-radius:4px; flex:none; z-index:3; }
-.shelf-arrow:hover { border-color:var(--gold); color:#fff; }
-.hardcover-row { display:grid; grid-template-columns:repeat(5, minmax(158px, 1fr)); gap:18px; width:100%; overflow-x:auto; padding:6px 8px 12px; scrollbar-width:none; }
+.shelf-wrap { position:relative; display:flex; align-items:center; gap:10px; }
+.shelf-arrow { width:34px; height:74px; background:rgba(18,15,10,.92); border:1px solid rgba(212,175,95,.42); color:#d4af5f; font-size:1.35rem; cursor:pointer; border-radius:6px; flex:none; z-index:3; transition:all .15s; }
+.shelf-arrow:hover { border-color:var(--gold); color:#fff; background:rgba(34,26,14,.96); }
+.hardcover-row { display:flex; gap:18px; width:100%; overflow-x:auto; padding:8px 6px 14px; scrollbar-width:none; scroll-snap-type:x mandatory; }
 .hardcover-row::-webkit-scrollbar { display:none; }
-.hc-col { display:flex; flex-direction:column; align-items:center; }
+.hc-col { flex:0 0 184px; display:flex; flex-direction:column; align-items:center; scroll-snap-align:start; }
 .hc-role { font-family:Marcellus,serif; font-size:.58rem; letter-spacing:.22em; color:#a99c80; margin-bottom:10px; text-transform:uppercase; }
 
 /* Tomo de tapa dura con lomo, filigrana dorada, emblema de rosa de los vientos y canto inferior de páginas */
@@ -349,12 +349,14 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 .hc-frame { position:relative; width:100%; height:100%; border:1.5px solid rgba(226,190,112,.68); border-radius:3px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end;
   box-shadow:inset 0 0 0 3px rgba(10,12,18,.65), inset 0 0 0 4px rgba(226,190,112,.32); }
 .hc-art { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:saturate(1.05) contrast(1.04); transition:transform .35s; }
+.hc-art.sketch-dark, .vol img.sketch-dark { filter:invert(.92) sepia(.28) hue-rotate(178deg) saturate(1.45) brightness(.86) contrast(1.2); }
 .hc-book:hover .hc-art { transform:scale(1.05); }
 .hc-shade { position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(8,10,16,.55) 0%, rgba(8,10,16,.12) 35%, rgba(8,10,16,.68) 72%, rgba(6,8,14,.95) 100%); }
+  background:linear-gradient(180deg, rgba(8,10,16,.58) 0%, rgba(8,10,16,.14) 35%, rgba(8,10,16,.72) 72%, rgba(6,8,14,.96) 100%); }
 
-.b-emblem { position:absolute; top:12px; left:50%; transform:translateX(-50%); width:42px; height:42px; color:#e6c476; z-index:2; filter:drop-shadow(0 2px 6px #000); }
-.hc-caption { position:relative; z-index:2; text-align:center; padding:12px 8px 10px; }
+.b-emblem { position:absolute; top:12px; left:50%; transform:translateX(-50%); width:42px; height:42px; color:#e6c476; z-index:2; filter:drop-shadow(0 2px 6px #000); transition:opacity .18s; }
+.hc-caption { position:relative; z-index:2; text-align:center; padding:12px 8px 10px; transition:opacity .18s; }
+.hc-book:hover .b-emblem, .hc-book:hover .hc-caption { opacity:0; }
 .hc-caption h3 { font-family:Marcellus,serif; font-size:.92rem; letter-spacing:.08em; color:#f6ecd3; margin:0 0 4px; text-shadow:0 2px 6px #000; line-height:1.2; }
 .hc-caption small { display:block; font-family:Marcellus,serif; font-size:.54rem; letter-spacing:.18em; color:#cbb582; }
 
@@ -423,30 +425,30 @@ nav.top, .panel, .book, .box, .vol, .thumb img, .home-grid a, .ba div { border-r
 /* Vista previa de capítulos al pasar el mouse sobre un volumen (hover índice) */
 .vol { overflow:hidden; }
 .vol-hover { position:absolute; inset:0; z-index:4;
-  background:linear-gradient(180deg, rgba(16,13,9,.94) 0%, rgba(18,14,10,.88) 65%, rgba(12,9,6,.97) 100%);
+  background:linear-gradient(180deg, rgba(14,11,8,.96) 0%, rgba(16,12,9,.94) 65%, rgba(10,8,5,.98) 100%);
   border:1px solid rgba(216,174,90,.55); border-radius:inherit;
-  padding:12px 13px 10px; display:flex; flex-direction:column; justify-content:space-between;
+  padding:10px 11px 9px; display:flex; flex-direction:column; justify-content:space-between;
   opacity:0; transform:translateY(6px); transition:opacity .22s ease, transform .22s ease; pointer-events:none;
-  backdrop-filter:blur(3px); text-align:left; }
+  backdrop-filter:blur(4px); text-align:left; }
 .vol:hover .vol-hover, .hc-book:hover .vol-hover { opacity:1; transform:translateY(0); }
 .vol:hover .cap, .vol:hover .new { opacity:0; transition:opacity .15s; }
 
-.vh-head { display:flex; justify-content:space-between; align-items:center;
-  font-family:Marcellus,serif; font-size:.58rem; letter-spacing:.18em; color:#d9ad55;
-  padding-bottom:6px; border-bottom:1px solid rgba(216,174,90,.35); margin-bottom:4px; }
-.vh-list { flex:1; display:flex; flex-direction:column; justify-content:center; gap:2px; overflow:hidden; }
-.vh-item { display:flex; align-items:baseline; gap:6px; padding:3px 2px;
-  border-bottom:1px solid rgba(216,174,90,.13); font-size:.74rem; color:#f2e7ce;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.25; }
+.vh-head { display:flex; justify-content:space-between; align-items:center; gap:4px; flex:none;
+  font-family:Marcellus,serif; font-size:.54rem; letter-spacing:.12em; color:#d9ad55; white-space:nowrap;
+  padding-bottom:5px; border-bottom:1px solid rgba(216,174,90,.35); margin-bottom:2px; }
+.vh-list { flex:1; display:flex; flex-direction:column; justify-content:center; gap:2px; overflow:hidden; min-height:0; }
+.vh-item { display:flex; align-items:center; gap:6px; padding:3px 2px; flex:none;
+  border-bottom:1px solid rgba(216,174,90,.14); font-size:.72rem; color:#f2e7ce;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
 .vh-item.done { color:#9ed9b0; }
-.vh-tag { font-family:Marcellus,serif; font-size:.58rem; font-weight:600; letter-spacing:.08em; color:#d9ad55; flex:none; }
-.vh-name { font-family:Lora,Georgia,serif; font-weight:600; overflow:hidden; text-overflow:ellipsis; }
-.vh-more { font-family:Marcellus,serif; font-size:.55rem; letter-spacing:.16em; color:#d9ad55;
-  padding:4px 6px; margin:2px 0; background:rgba(216,174,90,.12); border-top:1px solid rgba(216,174,90,.28); border-bottom:1px solid rgba(216,174,90,.28); }
+.vh-tag { font-family:Marcellus,serif; font-size:.56rem; font-weight:600; letter-spacing:.06em; color:#d9ad55; flex:none; min-width:14px; }
+.vh-name { font-family:Lora,Georgia,serif; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
+.vh-more { font-family:Marcellus,serif; font-size:.52rem; letter-spacing:.12em; color:#d9ad55; flex:none; white-space:nowrap; text-align:center;
+  padding:3px 5px; margin:2px 0; background:rgba(216,174,90,.12); border-top:1px solid rgba(216,174,90,.28); border-bottom:1px solid rgba(216,174,90,.28); }
 
-.vh-foot { text-align:center; padding-top:6px; border-top:1px solid rgba(216,174,90,.22); margin-top:4px; }
-.vh-vol { font-family:Marcellus,serif; font-size:.95rem; letter-spacing:.12em; color:rgba(242,231,206,.35); line-height:1; }
-.vh-foot small { display:block; font-family:Marcellus,serif; font-size:.52rem; letter-spacing:.2em; color:#cfc2a4; margin-top:3px; }
+.vh-foot { text-align:center; padding-top:5px; border-top:1px solid rgba(216,174,90,.22); margin-top:2px; flex:none; }
+.vh-vol { font-family:Marcellus,serif; font-size:.88rem; letter-spacing:.12em; color:rgba(242,231,206,.45); line-height:1.1; white-space:nowrap; }
+.vh-foot small { display:block; font-family:Marcellus,serif; font-size:.49rem; letter-spacing:.16em; color:#cfc2a4; margin-top:2px; white-space:nowrap; }
 
 /* Tarjetas enriquecidas de Proyectos con carrusel de arcos y lore */
 .proj-card { padding:28px; }
