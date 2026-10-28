@@ -13,8 +13,34 @@ const AVATARS = [
   "novela/art/sketch3.png"
 ];
 
+function normalizeUser(raw, fallbackEmail = "") {
+  let u = raw;
+  for (let i = 0; i < 3; i++) {
+    if (typeof u === "string") {
+      try { u = JSON.parse(u); } catch { break; }
+    } else break;
+  }
+  if (!u || typeof u !== "object") return null;
+  const cleanEmail = (u.email && u.email !== "undefined") ? u.email : fallbackEmail;
+  const defaultName = cleanEmail ? cleanEmail.split("@")[0] : "Viajero Kraniel";
+  const cleanName = (u.name && u.name !== "undefined") ? u.name : (store.get("nprofile", {})?.name || defaultName);
+  return {
+    ...u,
+    email: cleanEmail,
+    name: cleanName,
+    avatar: u.avatar || AVATARS[0],
+    progress: u.progress || {}
+  };
+}
+
 function getUsersDB() {
-  return store.get("velz_users", {});
+  const raw = store.get("velz_users", {});
+  const out = {};
+  for (const k of Object.keys(raw || {})) {
+    const norm = normalizeUser(raw[k], k);
+    if (norm) out[k] = norm;
+  }
+  return out;
 }
 function saveUsersDB(db) {
   store.set("velz_users", db);
@@ -26,7 +52,9 @@ function getCurrentUser() {
   const email = currentSessionEmail();
   if (!email) return null;
   const db = getUsersDB();
-  return db[email] || null;
+  if (!db[email]) return null;
+  saveUsersDB(db);
+  return db[email];
 }
 
 // Sincroniza las claves activas de lectura con el perfil del usuario que tiene sesión iniciada (local + nube si está disponible)
@@ -128,9 +156,6 @@ function renderLoginRegisterCard(errorMsg = "") {
   app.innerHTML = head("Archivo de Velztek", isLogin ? "Iniciar Sesión" : "Crear Cuenta") + `
     <div class="auth-wrap">
       <div class="auth-card panel">
-        <div id="cloud-badge" style="text-align:center;font-size:.76rem;padding:6px 10px;border-radius:999px;margin-bottom:14px;background:rgba(240,196,109,.08);border:1px solid var(--line);color:var(--muted)">
-          ⏳ Verificando conexión con la base de datos…
-        </div>
         <div class="auth-tabs">
           <button type="button" class="${isLogin ? "on" : ""}" id="tab-login">Iniciar Sesión</button>
           <button type="button" class="${!isLogin ? "on" : ""}" id="tab-reg">Registrarse</button>
@@ -168,18 +193,6 @@ function renderLoginRegisterCard(errorMsg = "") {
   document.getElementById("tab-login").onclick = () => { authMode = "login"; renderLoginRegisterCard(); };
   document.getElementById("tab-reg").onclick = () => { authMode = "register"; renderLoginRegisterCard(); };
   document.getElementById("switch-auth").onclick = () => { authMode = isLogin ? "register" : "login"; renderLoginRegisterCard(); };
-
-  callCloudAuth({ action: "status" }).then(st => {
-    const el = document.getElementById("cloud-badge");
-    if (!el) return;
-    if (st && st.cloud) {
-      el.style.borderColor = "rgba(80,210,140,.45)";
-      el.style.color = "#8ff0b8";
-      el.innerHTML = "🟢 Base de Datos en la Nube Conectada · Guardado 24/7 activo";
-    } else {
-      el.innerHTML = "💾 Modo Local del Navegador · Crea o restaura tu cuenta aquí";
-    }
-  });
 
   app.querySelectorAll("[data-ava]").forEach(img => {
     img.onclick = () => {
@@ -231,10 +244,11 @@ function renderLoginRegisterCard(errorMsg = "") {
       const cloudRes = await callCloudAuth({ action: "login", email, passHash });
       if (cloudRes && cloudRes.cloud) {
         if (!cloudRes.ok) return renderLoginRegisterCard(cloudRes.error || "Error al iniciar sesión.");
-        db[email] = cloudRes.user;
+        const cleanUser = normalizeUser(cloudRes.user, email);
+        db[email] = cleanUser;
         saveUsersDB(db);
         store.set("velz_session", email);
-        loadUserProgressIntoActive(cloudRes.user);
+        loadUserProgressIntoActive(cleanUser);
         return renderAuthView();
       }
       // 2. Respaldo local en el navegador si la base de datos en la nube aún no está conectada
@@ -309,12 +323,13 @@ async function renderLoggedProfile(user) {
         <div style="display:flex;gap:18px;align-items:center;flex:1;min-width:260px;flex-wrap:wrap">
           <img src="${user.avatar || AVATARS[0]}" alt="Avatar" class="prof-ava">
           <div style="flex:1;min-width:200px">
-            <div class="eyebrow" style="text-align:left">CUENTA ACTIVA · ${esc(user.email)} <span id="prof-cloud-badge" style="margin-left:8px;color:#8ff0b8;font-size:.72rem"></span></div>
+            <div class="eyebrow" style="text-align:left">CUENTA ACTIVA · ${esc(user.email)}</div>
             <div style="display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap">
               <input id="profname" value="${esc(user.name)}" class="finput" style="margin:0;font-size:1.2rem;max-width:240px">
               <button class="ghost" id="savename">Guardar</button>
               <button class="ghost" id="btnlogout" style="border-color:rgba(235,95,120,.5);color:#ff9aa8">Cerrar sesión</button>
             </div>
+            <div id="namemsg" style="color:var(--gold);font-size:.82rem;margin:4px 0"></div>
             <div class="ava-grid" style="margin-top:8px">
               ${AVATARS.map(a => `<img src="${a}" data-chava="${a}" class="ava-pick small ${a === user.avatar ? "on" : ""}" title="Cambiar avatar">`).join("")}
             </div>
@@ -371,24 +386,24 @@ async function renderLoggedProfile(user) {
       </div>
     </div>`;
 
-  callCloudAuth({ action: "status" }).then(st => {
-    const b = document.getElementById("prof-cloud-badge");
-    if (b && st && st.cloud) b.textContent = "· 🟢 Guardado en la Nube Activo";
-  });
-
+  const sessionKey = currentSessionEmail() || user.email;
   document.getElementById("savename").onclick = () => {
     const val = document.getElementById("profname").value.trim() || user.name;
     const db = getUsersDB();
-    db[user.email].name = val;
+    if (!db[sessionKey]) db[sessionKey] = normalizeUser(user, sessionKey);
+    db[sessionKey].name = val;
+    store.set("nprofile", { name: val, avatar: db[sessionKey].avatar });
     saveUsersDB(db);
     syncProgressToUser();
     updateHeaderAccountBtn();
-    document.getElementById("syncmsg").textContent = "✓ Nombre actualizado y guardado en la nube.";
+    const nm = document.getElementById("namemsg");
+    if (nm) nm.textContent = "✓ Nombre guardado correctamente.";
   };
   app.querySelectorAll("[data-chava]").forEach(img => {
     img.onclick = () => {
       const db = getUsersDB();
-      db[user.email].avatar = img.dataset.chava;
+      if (!db[sessionKey]) db[sessionKey] = normalizeUser(user, sessionKey);
+      db[sessionKey].avatar = img.dataset.chava;
       saveUsersDB(db);
       syncProgressToUser();
       renderAuthView();

@@ -4,20 +4,35 @@
 const REST_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || "";
 const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || "";
 
+function unwrapJson(raw) {
+  let cur = raw;
+  for (let i = 0; i < 3; i++) {
+    if (typeof cur === "string") {
+      try { cur = JSON.parse(cur); } catch { break; }
+    } else {
+      break;
+    }
+  }
+  return (cur && typeof cur === "object") ? cur : null;
+}
+
 async function kvGet(key) {
-  const r = await fetch(`${REST_URL}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${REST_TOKEN}` }
+  const r = await fetch(REST_URL, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${REST_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify(["GET", key])
   });
   const data = await r.json();
   if (!data || data.result == null) return null;
-  try { return JSON.parse(data.result); } catch { return data.result; }
+  return unwrapJson(data.result);
 }
 
 async function kvSet(key, val) {
-  await fetch(`${REST_URL}/set/${encodeURIComponent(key)}`, {
+  const clean = unwrapJson(val) || val;
+  await fetch(REST_URL, {
     method: "POST",
     headers: { Authorization: `Bearer ${REST_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify(JSON.stringify(val))
+    body: JSON.stringify(["SET", key, JSON.stringify(clean)])
   });
 }
 
