@@ -520,7 +520,7 @@ function viewWorldMap() {
     selectedPinId = nodes[0].id;
   }
   const cur = nodes.find(n => n.id === selectedPinId) || nodes[0];
-  const mapImgSrc = mapMode === "continentes" ? "novela/map-world.jpg" : "novela/map-kraniel.jpg";
+  const mapImgSrc = mapMode === "continentes" ? "novela/map-world.jpg?v=20261028c" : "novela/map-kraniel.jpg?v=20261028c";
 
   app.innerHTML = head("Cartografía Oficial de WARYONI", "Mapa del Mundo") + `
     <p class="muted" style="text-align:center;margin-top:-10px">Explora el Supercontinente Central (Juhne, Suyne y Aleria), los 39 Clanes Velztek, el Pueblo Kraen y el Gran Bosque de Aries.</p>
@@ -534,7 +534,8 @@ function viewWorldMap() {
     </div>
 
     <div class="map-layout">
-      <div class="panel map-stage">
+      <div class="panel map-stage" style="position:relative">
+        <i class="mc tl"></i><i class="mc tr"></i><i class="mc bl"></i><i class="mc br"></i>
         <div class="map-viewport" id="map-viewport">
           <div class="map-zoom-controls">
             <button type="button" class="ib" id="mz-in" title="Acercar mapa">＋</button>
